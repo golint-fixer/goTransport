@@ -50,6 +50,8 @@ fabric.properties
 *.a
 *.so
 
+.idea
+
 # Folders
 _obj
 _test
