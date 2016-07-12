@@ -1,0 +1,24 @@
+{
+  "name": "goTransport-angular1",
+  "main": "index.js",
+  "authors": [
+    "Iain Munro iain.munro@imunro.nl"
+  ],
+  "description": "goTransport angular 1 module",
+  "keywords": [
+    "goTransport",
+    "angular"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-sockjs": "^0.1.0"
+  }
+}
