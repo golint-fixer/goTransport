@@ -1,10 +1,11 @@
 package goTransport
 import (
-	"encoding/json"
-	"errors"
+	//"encoding/json"
+	//"errors"
 )
+import "log"
 
-type handleMethod struct {
+type HandleMethod struct {
 	Message *Message
 	Data struct {
 		     Name       string `json:"name"`
@@ -14,29 +15,22 @@ type handleMethod struct {
 
 func init() {
 	SetParser(MessageTypeMethod, &Parser{
-		Parse: parse,
+		Get: get,
 		ReturnMessageType:MessageTypeMethodResult,
 	})
 }
 
-func parse(message *Message, returnMessageType MessageType) (Handler, error) {
-	var handler handleMethod
-	err := json.Unmarshal(message.Json, &handler)
-	if err != nil {
-		return nil, err
-	}
-	handler.Message = message
-	if handler.getMethod() == nil {
-		return nil, errors.New("Method doesn't exist")
-	}
-	return handler, nil
+func get() IHandler {
+	var handler HandleMethod
+	return handler
 }
 
-func (m handleMethod) getMethod() RPCMethod {
+func (m HandleMethod) getMethod() RPCMethod {
 	return m.Message.Transport.getRPCMethod(m.Data.Name)
 }
 
-func (m handleMethod) Call() {
-	rpcMethod := m.getMethod()
-	rpcMethod(m.Data.Parameters)
+func (m HandleMethod) Test123() {
+	log.Print("jaja", m.Data.Name)
+	//rpcMethod := m.getMethod()
+	//rpcMethod(m.Data.Parameters)
 }

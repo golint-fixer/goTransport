@@ -3,13 +3,17 @@ package goTransport
 import "sync"
 
 //Parser
-type Handler interface {
-	Call()
+type IHandler interface {
+	Test123()
+}
+
+type Handler struct {
+	Message Message
 }
 
 type Parser struct {
 	//Validate the message. and returns a handler
-	Parse func(*Message, MessageType) (Handler, error)
+	Get func() IHandler
 	ReturnMessageType MessageType
 }
 
@@ -26,7 +30,7 @@ func SetParser(messageType MessageType, parser *Parser) {
 	parsers_mutex.Unlock()
 }
 
-func GetParser(messageType MessageType) *Parser {
+func GetHandler(messageType MessageType) *Parser {
 	if a, ok := parsers[messageType]; ok {
 		return a
 	}

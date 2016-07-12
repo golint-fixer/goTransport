@@ -3,6 +3,8 @@ package goTransport
 import (
 	"log"
 	"gopkg.in/igm/sockjs-go.v2/sockjs"
+	"encoding/json"
+	"reflect"
 )
 
 type MessageType int
@@ -22,20 +24,23 @@ type Message struct {
 	Json	[]byte
 }
 
-func (message *Message) Handle() {
+func (message *Message) Call() {
 	log.Printf("Received new message %d with type %d", message.Id, message.Type)
-	parser := GetParser(message.Type)
-	if parser == nil {
+	handlerA := GetHandler(message.Type)
+	if handlerA == nil {
 		log.Print("No parser found for message type: %d", message.Type)
 		return
 	}
-	handler, err := parser.Parse(message, parser.ReturnMessageType)
+	handlerB := reflect.ValueOf(handlerA.Get())
+	handler := reflect.New(handlerB.Type()).Interface()
+
+	log.Print(string(message.Json))
+	err := json.Unmarshal(message.Json, &handler)
 	if err != nil {
 		log.Print(err)
 		return
 	}
-
-	handler.Call()
+	handler.(IHandler).Test123()
 }
 
 func (message *Message) Reply() {

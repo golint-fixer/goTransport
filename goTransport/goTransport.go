@@ -3,9 +3,6 @@ package goTransport
 import (
 	"gopkg.in/igm/sockjs-go.v2/sockjs"
 	"net/http"
-	//"log"
-	//"encoding/json"
-	//"goTransport/goTransport/handlers"
 	"encoding/json"
 	"log"
 )
@@ -24,7 +21,6 @@ func NewTransport(prefix string) *Transport {
 		methods: make(map[string]RPCMethod),
 	}
 	transport.HttpHandler = sockjs.NewHandler(prefix, sockjs.DefaultOptions, transport.listen)
-	log.Print("returned transport")
 	return transport
 }
 
@@ -39,7 +35,7 @@ func (transport *Transport) listen(session sockjs.Session) {
 			message.Transport = transport
 			message.Session = session
 			message.Json = []byte(msg)
-			message.Handle()
+			message.Call()
 			continue
 		}
 		break
