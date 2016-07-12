@@ -12,7 +12,8 @@ angular.module('goTransport', [
 				MessageTypePub: 1
 			},
 			message: function(message) {
-				console.log('message', message);
+				message.data = JSON.parse(message.data);
+				console.log('receiving', message);
 			},
 			send: function(type, data) {
 				if(this.socket == null)
@@ -47,7 +48,7 @@ angular.module('goTransport', [
 			},
 			method: function(methodName, parameters) {
 				transport.send(transport.messageTypes.MessageTypeMethod, {
-					name: 'ping',
+					name: methodName,
 					parameters: parameters
 				});
 			}

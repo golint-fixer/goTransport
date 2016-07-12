@@ -6,7 +6,7 @@ import (
 
 var methods_mutex = new(sync.Mutex)
 
-type RPCMethod func(parameters []interface{})
+type RPCMethod interface{}
 
 func (transport *Transport) SetRPCMethod(name string, method RPCMethod) {
 	methods_mutex.Lock()

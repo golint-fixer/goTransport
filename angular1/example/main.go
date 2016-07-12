@@ -20,6 +20,7 @@ func main() {
 }
 
 
-func ping(parameters []interface{}) {
-	log.Print("called jaja")
+func ping(message string) string {
+	log.Print("called", message)
+	return "bar"
 }
