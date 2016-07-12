@@ -26,21 +26,19 @@ type Message struct {
 
 func (message *Message) Call() {
 	log.Printf("Received new message %d with type %d", message.Id, message.Type)
-	handlerA := GetHandler(message.Type)
-	if handlerA == nil {
+	parser := GetParser(message.Type)
+	if parser == nil {
 		log.Print("No parser found for message type: %d", message.Type)
 		return
 	}
-	handlerB := reflect.ValueOf(handlerA.Get())
-	handler := reflect.New(handlerB.Type()).Interface()
-
+	handler := reflect.New(parser.Type).Interface()
 	log.Print(string(message.Json))
 	err := json.Unmarshal(message.Json, &handler)
 	if err != nil {
 		log.Print(err)
 		return
 	}
-	handler.(IHandler).Test123()
+	handler.(IHandler).Call()
 }
 
 func (message *Message) Reply() {

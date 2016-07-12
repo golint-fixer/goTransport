@@ -1,19 +1,18 @@
 package goTransport
 
-import "sync"
+import (
+	"sync"
+	"reflect"
+)
 
 //Parser
 type IHandler interface {
-	Test123()
-}
-
-type Handler struct {
-	Message Message
+	Call()
 }
 
 type Parser struct {
 	//Validate the message. and returns a handler
-	Get func() IHandler
+	Type reflect.Type
 	ReturnMessageType MessageType
 }
 
@@ -24,13 +23,16 @@ func initStorage() {
 	parsers = make(map[MessageType]*Parser)
 }
 
-func SetParser(messageType MessageType, parser *Parser) {
+func SetParser(messageType MessageType, returnMessageType MessageType, handler IHandler) {
 	parsers_mutex.Lock()
-	parsers[messageType] = parser
+	parsers[messageType] = &Parser{
+		Type: reflect.TypeOf(handler),
+		ReturnMessageType:returnMessageType,
+	}
 	parsers_mutex.Unlock()
 }
 
-func GetHandler(messageType MessageType) *Parser {
+func GetParser(messageType MessageType) *Parser {
 	if a, ok := parsers[messageType]; ok {
 		return a
 	}

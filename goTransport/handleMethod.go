@@ -3,7 +3,9 @@ import (
 	//"encoding/json"
 	//"errors"
 )
-import "log"
+import (
+	"log"
+)
 
 type HandleMethod struct {
 	Message *Message
@@ -14,23 +16,15 @@ type HandleMethod struct {
 }
 
 func init() {
-	SetParser(MessageTypeMethod, &Parser{
-		Get: get,
-		ReturnMessageType:MessageTypeMethodResult,
-	})
-}
-
-func get() IHandler {
-	var handler HandleMethod
-	return handler
+	SetParser(MessageTypeMethod, MessageTypeMethodResult, HandleMethod{})
 }
 
 func (m HandleMethod) getMethod() RPCMethod {
 	return m.Message.Transport.getRPCMethod(m.Data.Name)
 }
 
-func (m HandleMethod) Test123() {
-	log.Print("jaja", m.Data.Name)
-	//rpcMethod := m.getMethod()
-	//rpcMethod(m.Data.Parameters)
+func (m HandleMethod) Call() {
+	log.Print("Method called:", m.Data.Name)
+	rpcMethod := m.getMethod()
+	rpcMethod(m.Data.Parameters)
 }
