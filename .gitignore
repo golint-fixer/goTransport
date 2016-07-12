@@ -57,6 +57,7 @@ _test
 # Architecture specific extensions/prefixes
 *.[568vq]
 [568vq].out
+/angular1/module/typings
 
 *.cgo1.go
 *.cgo2.c

@@ -1,6 +1,6 @@
 {
   "name": "goTransport-angular1",
-  "main": "index.js",
+  "main": "goTransport.js",
   "authors": [
     "Iain Munro iain.munro@imunro.nl"
   ],
