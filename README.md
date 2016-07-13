@@ -1,7 +1,8 @@
-# goTransport
-[GoTransport](https://github.com/iain17/goTransport) GoLang-SockJS-Angular 1, RPC socket.
+![alt tag](http://www.evanmiller.org/images/go-gopher3.png)
+# GoTransport
+[GoTransport](https://github.com/iain17/goTransport) GoLang-SockJS-Angular 1, RPC++ socket.
 A RPC SockJS GoLang library. Starting with an Angular 1 client this library tries to fulfill the dire need I have for a proper javascript to Go RPC socket connection.
-Eventually it should also pub and sub on events and collections of data.
+Eventually it should also pub and sub on events and sync collections of data.
 
 Building on top off the work of: [Ben Drucker's angular-sockjs](https://github.com/bendrucker/angular-sockjs) and [Igor Mihalik's sockjs-go](https://github.com/igm/sockjs-go).
 
@@ -26,6 +27,7 @@ This should fetch all the dependencies using bower and run a basic go http serve
 
 ## Usage
 ### Making a Remote procedure call
+**Example Client:**
 ```javascript
 angular.module('goTransport-example', ['goTransport'])
 	.controller('mainController', function($scope, goTransport) {
@@ -37,10 +39,39 @@ angular.module('goTransport-example', ['goTransport'])
 
 		$scope.pong = '';
 		$scope.ping = function() {
-			goTransport.method('ping', ['hai']);
-		};
-	});
+			goTransport.method('ping', ['hai']).then(function(message, err) {
+			    if(err) {
+			        console.error(err);
+			        return;
+			    }
+			    console.log(result);
+            });
+        };
+    });
 ```
+**Example Server:**
+```go
+package main
+
+import (
+	"net/http"
+	"log"
+	"github.com/iain17/goTransport/transport"
+)
+
+func main() {
+	transporter := transport.NewTransport("/ws")
+	transporter.SetRPCMethod("ping", ping)
+	http.Handle("/ws/", transporter.HttpHandler)
+	log.Fatal(http.ListenAndServe(":8081", nil))
+}
+//Free parameters and return values. No array of interfaces.
+func ping(message string) (string, error) {
+	log.Print("called", message)
+	return "bar", nil
+}
+```
+
 ### Publish–subscribe.
 
 ### Data-collection sync.

@@ -2,66 +2,65 @@
 
 module goTransport {
     "use strict";
-    console.log('okay');
-    function factory(socketFactory: any, $q : ng.IQService){
-        var transport = {
-            socket: null,
-            connected: $q.defer(),
-            id: 0,
-            messageTypes: {
-                MessageTypeMethod: 0,
-                MessageTypePub: 1
-            },
-            message: function(message) {
-                message.data = JSON.parse(message.data);
-                console.log('receiving', message);
-            },
-            send: function(type, data) {
-                this.connected.promise.then(function() {
-                    this.socket.send(JSON.stringify({
-                        id: this.id++,
-                        type: type,
-                        data: data
-                    }));
-                }.bind(this));
-            }
-        };
+    import Adapter = Socket.Adapter;
 
-        var handlers = {};
-        handlers[transport.messageTypes.MessageTypeMethod] = {
-            call: function() {
+    export class GoTransport implements Socket.SocketDelegate{
+        public static socket: Socket.Socket;
+        public static connected: ng.IDeferred<{}>;
 
-            }
-        };
+        constructor(private $q : ng.IQService) {
+            this.$q = $q;
+            GoTransport.connected = $q.defer();
+        }
 
-        return {
-            connect: function(url) {
-                if(transport.socket == null) {
-                    transport.socket = socketFactory({
-                        url: url
-                    });
-                    transport.socket.setHandler('open', transport.connected.resolve);
-                    transport.socket.setHandler('message', transport.message);
-                    // transport.socket.setHandler('close', connected.reject);
-                }
-                return transport.connected.promise;
-            },
-            //Can be called anywhere. Tells us when
-            onConnect: function() {
-                return transport.connected.promise;
-            },
-            method: function(methodName, parameters) {
-                transport.send(transport.messageTypes.MessageTypeMethod, {
-                    name: methodName,
-                    parameters: parameters
-                });
+        public static Main($q : ng.IQService): GoTransport {
+            return new GoTransport($q);
+        }
+
+        public connect(url : string): ng.IPromise<{}> {
+            if(GoTransport.socket == null) {
+                GoTransport.socket = Socket.Adapter.getSocket("SockJSClient", url, this);
             }
-        };
+            return GoTransport.connected.promise;
+        }
+
+        public connected() {
+            console.log('connected');
+            GoTransport.connected.resolve();
+        }
+
+        public message(data:string) {
+            var message = Message.fromJSON(data);
+            console.log('receiving', message);
+        }
+
+        public disconnected(code:number, reason:string, wasClean:boolean) {
+            console.log(code);
+        }
+
+        private send(type : MessageType, data : any) {
+            var message = new Message(type, data);
+            message.send();
+        }
+
+        public method(methodName: string, parameters: any[]): ng.IPromise<{}> {
+            //TODO: proper promise
+            var q = this.$q.defer();
+            this.send(MessageType.MessageTypeMethod, {
+                name: methodName,
+                parameters: parameters
+            });//TODO: Method class
+            return q.promise;
+        }
+
+        public onConnect(): ng.IPromise<{}> {
+            return GoTransport.connected.promise;
+        }
+
     }
 
-    factory.$inject = ["socketFactory", "$q"];
-
+    //Attach the above to angular
     angular
         .module("goTransport")
-        .factory('goTransport', factory);
+        .factory("goTransport", ["$q", GoTransport.Main]);
 }

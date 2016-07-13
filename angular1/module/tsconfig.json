@@ -9,7 +9,15 @@
     "sourceMap": true
   },
   "files": [
+    //util
+    "utils/global.d.ts",
+    //socket
+    "Socket/Socket.ts",
+    "Socket/SockJSClient.ts",
+
     "app.module.ts",
-    "app.goTransport.ts"
+    "app.goTransport.ts",
+    "Message.ts",
+    "handlers/handler.ts"
   ]
 }
