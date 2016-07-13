@@ -11,6 +11,7 @@ You must have Bower and GoLang installed before you can continue.
 - [Documentation about installing bower](https://bower.io/#install-bower)
 - [Documentation about installing GoLang](https://golang.org/doc/install)
 - Basic knowledge of both Angular and GoLang.
+
 ###Install
 1. `bower install goTransport-angular1`
 2. Made sure the [SockJS client library](https://github.com/sockjs/sockjs-client) is loaded. (It should automatically get loaded in as a bower dependency)
