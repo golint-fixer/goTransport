@@ -1,4 +1,4 @@
-package goTransport
+package transport
 
 import (
 	"gopkg.in/igm/sockjs-go.v2/sockjs"
@@ -6,10 +6,6 @@ import (
 	"encoding/json"
 	"log"
 )
-
-func init() {
-	initStorage()
-}
 
 type Transport struct {
 	HttpHandler http.Handler

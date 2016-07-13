@@ -5,7 +5,7 @@
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
-    "outFile": "../dist/goTransport.js",
+    "outFile": "../../dist/goTransport-angular1.js",
     "sourceMap": true
   },
   "files": [

@@ -1,4 +1,4 @@
-package goTransport
+package transport
 import (
 	"errors"
 	"reflect"

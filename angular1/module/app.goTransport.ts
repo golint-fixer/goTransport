@@ -1,9 +1,8 @@
 /// <reference path="typings/angularjs/angular.d.ts" />
-/// <reference path="typings/angularjs/angular-route.d.ts" />
 
 module goTransport {
     "use strict";
-
+    console.log('okay');
     function factory(socketFactory: any, $q : ng.IQService){
         var transport = {
             socket: null,

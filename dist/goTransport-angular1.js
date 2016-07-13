@@ -1,13 +1,13 @@
 var goTransport;
 (function (goTransport) {
     "use strict";
-    console.log('jaja');
     angular
         .module("goTransport", ['bd.sockjs']);
 })(goTransport || (goTransport = {}));
 var goTransport;
 (function (goTransport) {
     "use strict";
+    console.log('okay');
     function factory(socketFactory, $q) {
         var transport = {
             socket: null,
@@ -63,4 +63,4 @@ var goTransport;
         .module("goTransport")
         .factory('goTransport', factory);
 })(goTransport || (goTransport = {}));
-//# sourceMappingURL=goTransport.js.map
+//# sourceMappingURL=goTransport-angular1.js.map

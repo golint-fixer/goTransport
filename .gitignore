@@ -21,6 +21,7 @@
 # Gradle:
 .idea/gradle.xml
 .idea/libraries
+bower_components
 
 # Mongo Explorer plugin:
 .idea/mongoSettings.xml

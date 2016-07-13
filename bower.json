@@ -1,6 +1,6 @@
 {
   "name": "goTransport-angular1",
-  "main": "goTransport.js",
+  "main": "dist/goTransport.js",
   "authors": [
     "Iain Munro iain.munro@imunro.nl"
   ],
@@ -19,6 +19,7 @@
     "tests"
   ],
   "dependencies": {
-    "angular-sockjs": "^0.1.0"
+    "angular-sockjs": "^0.1.0",
+    "sockjs-client": "^1.1.1"
   }
 }
