@@ -7,6 +7,10 @@ Eventually it should also pub and sub on events and sync collections of data.
 Building on top off the work of: [Igor Mihalik's sockjs-go](https://github.com/igm/sockjs-go).
 
 ##GoTransport - Angular 1 module
+You must have Bower and GoLang installed before you can continue.
+- [Documentation about installing bower](https://bower.io/#install-bower)
+- [Documentation about installing GoLang](https://golang.org/doc/install)
+- Basic knowledge of both Angular and GoLang.
 ###Install
 1. `bower install goTransport-angular1`
 2. Made sure the [SockJS client library](https://github.com/sockjs/sockjs-client) is loaded. (It should automatically get loaded in as a bower dependency)
@@ -14,9 +18,6 @@ Building on top off the work of: [Igor Mihalik's sockjs-go](https://github.com/i
 4. Open your Go application and `import "github.com/iain17/goTransport/transport"`
 
 ###How to get the example running
-You must have Bower and GoLang installed before you can continue.
-- [Documentation about installing bower](https://bower.io/#install-bower)
-- [Documentation about installing GoLang](https://golang.org/doc/install)
 1. `go get github.com/iain17/goTransport/transport`
 2. `cd "$GOPATH/src/github.com/iain17/goTransport"`
 2. `bower install`
