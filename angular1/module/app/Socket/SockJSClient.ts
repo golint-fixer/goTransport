@@ -16,16 +16,13 @@ module Socket {
         }
 
         public static getInstance(url:string, delegate:Socket.SocketDelegate):Socket.Socket {
-            console.log('Ik ben bezig');
             if (!SockJSClient.instance) {
-                console.log('new instance');
                 SockJSClient.instance = new SockJSClient(url, delegate);
             }
             return SockJSClient.instance;
         }
 
         private open(e:any) {//__SockJSClient.OpenEvent
-            console.log('deletegate', this.delegate);
             this.delegate.connected()
         }
 

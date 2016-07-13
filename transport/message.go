@@ -37,7 +37,7 @@ func (message *Message) Call() {
 		return
 	}
 	handler := reflect.New(handleDefinition.Type).Interface()
-	//log.Print(string(message.Json))
+	log.Print(string(message.Json))
 	err := json.Unmarshal(message.Json, &handler)
 	if err != nil {
 		log.Print("Error unmarshalling the message", err)
@@ -58,7 +58,9 @@ func (message *Message) Call() {
 		return
 	}
 
-	err = iHandler.Run(message)
+	var result interface{}
+	result, err = iHandler.Run(message)
+
 	if err != nil {
 		log.Print("Error running handler", err)
 		message.Reply(Reply{
@@ -66,6 +68,10 @@ func (message *Message) Call() {
 			Result: err,
 		})
 	}
+	message.Reply(Reply{
+		Success: true,
+		Result: result,
+	})
 	log.Print("Finished")
 }
 

@@ -19,13 +19,14 @@ func init() {
 
 func (m HandleMethod) Validate(message *Message) error {
 	////Run some checks.
+	log.Print(m.Data)
 	if message.Transport.getRPCMethod(m.Data.Name) == nil  {
-		return errors.New("[404]: Invalid method.")
+		return errors.New("[404]: Unknown method:"+m.Data.Name)
 	}
 	return nil
 }
 
-func (m HandleMethod) Run(message *Message) error {
+func (m HandleMethod) Run(message *Message) (interface{}, error) {
 	defer func() {
 		// recover from panic if one occured. Set err to nil otherwise.
 		if (recover() != nil) {
@@ -38,7 +39,7 @@ func (m HandleMethod) Run(message *Message) error {
 
 	rpcMethod := reflect.ValueOf(message.Transport.getRPCMethod(m.Data.Name))
 	if len(m.Data.Parameters) != rpcMethod.Type().NumIn() {
-		return errors.New("The number of parameters sent do not match the amount required.")
+		return nil, errors.New("The number of parameters sent do not match the amount required.")
 	}
 	in := make([]reflect.Value, len(m.Data.Parameters))
 	for k, param := range m.Data.Parameters {
@@ -53,10 +54,5 @@ func (m HandleMethod) Run(message *Message) error {
 			result = append(result, value.Interface())
 		}
 	}
-
-	message.Reply(Reply{
-		Success: true,
-		Result: result,
-	})
-	return nil
+	return result, nil
 }

@@ -7,7 +7,7 @@ import (
 
 type IHandler interface {
 	Validate(*Message) error
-	Run(*Message) error
+	Run(*Message) (interface{}, error)
 }
 
 type HandlerDefinition struct {

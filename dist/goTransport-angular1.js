@@ -1,58 +1,3 @@
-var Socket;
-(function (Socket) {
-    var Adapter = (function () {
-        function Adapter() {
-        }
-        Adapter.getSocket = function (type, url, delegate) {
-            switch (type) {
-                case "SockJSClient":
-                    return Socket.SockJSClient.getInstance(url, delegate);
-                default:
-                    throw ("Invalid socket type:" + type);
-            }
-        };
-        return Adapter;
-    }());
-    Socket.Adapter = Adapter;
-})(Socket || (Socket = {}));
-var Socket;
-(function (Socket) {
-    var SockJSClient = (function () {
-        function SockJSClient(url, delegate) {
-            this.delegate = delegate;
-            this.connection = new SockJS(url);
-            this.connection.onopen = function (e) { this.open(e); }.bind(this);
-            this.connection.onclose = function (e) { this.disconnect(e); }.bind(this);
-            this.connection.onmessage = function (e) { this.message(e); }.bind(this);
-        }
-        SockJSClient.getInstance = function (url, delegate) {
-            console.log('Ik ben bezig');
-            if (!SockJSClient.instance) {
-                console.log('new instance');
-                SockJSClient.instance = new SockJSClient(url, delegate);
-            }
-            return SockJSClient.instance;
-        };
-        SockJSClient.prototype.open = function (e) {
-            console.log('deletegate', this.delegate);
-            this.delegate.connected();
-        };
-        SockJSClient.prototype.disconnect = function (e) {
-            this.delegate.disconnected(e.code, e.reason, e.wasClean);
-        };
-        SockJSClient.prototype.message = function (e) {
-            this.delegate.message(e.data);
-        };
-        SockJSClient.prototype.send = function (data) {
-            this.connection.send(data);
-        };
-        SockJSClient.prototype.close = function () {
-            this.connection.close();
-        };
-        return SockJSClient;
-    }());
-    Socket.SockJSClient = SockJSClient;
-})(Socket || (Socket = {}));
 var goTransport;
 (function (goTransport) {
     "use strict";
@@ -61,54 +6,53 @@ var goTransport;
 })(goTransport || (goTransport = {}));
 var goTransport;
 (function (goTransport) {
+    class Callback {
+    }
+    goTransport.Callback = Callback;
+})(goTransport || (goTransport = {}));
+var goTransport;
+(function (goTransport) {
     "use strict";
-    var GoTransport = (function () {
-        function GoTransport($q) {
+    class GoTransport {
+        constructor($q, $timeout) {
             this.$q = $q;
-            this.$q = $q;
-            GoTransport.connected = $q.defer();
+            this.$timeout = $timeout;
+            this.connectedPromise = $q.defer();
+            this.callback = new goTransport.Callback();
         }
-        GoTransport.Main = function ($q) {
-            return new GoTransport($q);
-        };
-        GoTransport.prototype.connect = function (url) {
-            if (GoTransport.socket == null) {
-                GoTransport.socket = Socket.Adapter.getSocket("SockJSClient", url, this);
+        static GetInstance($q, $timeout) {
+            if (!GoTransport.instance)
+                GoTransport.instance = new GoTransport($q, $timeout);
+            return GoTransport.instance;
+        }
+        connect(url) {
+            if (this.socket == null) {
+                this.socket = Socket.Adapter.getSocket("SockJSClient", url, this);
             }
-            return GoTransport.connected.promise;
-        };
-        GoTransport.prototype.connected = function () {
-            console.log('connected');
-            GoTransport.connected.resolve();
-        };
-        GoTransport.prototype.message = function (data) {
+            return this.connectedPromise.promise;
+        }
+        connected() {
+            this.connectedPromise.resolve();
+        }
+        message(data) {
             var message = goTransport.Message.fromJSON(data);
             console.log('receiving', message);
-        };
-        GoTransport.prototype.disconnected = function (code, reason, wasClean) {
-            console.log(code);
-        };
-        GoTransport.prototype.send = function (type, data) {
-            var message = new goTransport.Message(type, data);
-            message.send();
-        };
-        GoTransport.prototype.method = function (methodName, parameters) {
-            var q = this.$q.defer();
-            this.send(goTransport.MessageType.MessageTypeMethod, {
-                name: methodName,
-                parameters: parameters
-            });
-            return q.promise;
-        };
-        GoTransport.prototype.onConnect = function () {
-            return GoTransport.connected.promise;
-        };
-        return GoTransport;
-    }());
+        }
+        disconnected(code, reason, wasClean) {
+            this.connectedPromise.reject(reason);
+        }
+        method(methodName, parameters) {
+            var message = new goTransport.Message(new goTransport.MethodHandler(methodName, parameters));
+            return message.send();
+        }
+        onConnect() {
+            return this.connectedPromise.promise;
+        }
+    }
     goTransport.GoTransport = GoTransport;
     angular
         .module("goTransport")
-        .factory("goTransport", ["$q", GoTransport.Main]);
+        .factory("goTransport", ["$q", "$timeout", GoTransport.GetInstance]);
 })(goTransport || (goTransport = {}));
 var goTransport;
 (function (goTransport) {
@@ -118,36 +62,125 @@ var goTransport;
         MessageType[MessageType["MessageTypePub"] = 2] = "MessageTypePub";
     })(goTransport.MessageType || (goTransport.MessageType = {}));
     var MessageType = goTransport.MessageType;
-    var Message = (function () {
-        function Message(type, data) {
-            this.type = type;
+    class Message {
+        constructor(messageHandler) {
+            this.type = messageHandler.getMessageType();
             this.id = Message.current_id++;
-            this.data = data;
+            this.data = messageHandler.toJSON();
+            if (!Message.promises) {
+                Message.promises = [];
+            }
         }
-        Message.prototype.send = function () {
-            goTransport.GoTransport.connected.promise.then(function () {
-                goTransport.GoTransport.socket.send(JSON.stringify(this.toJSON()));
-                console.log('sent');
+        send(timeout = 3000) {
+            Message.promises[this.id] = goTransport.GoTransport.instance.$q.defer();
+            goTransport.GoTransport.instance.connectedPromise.promise.then(function () {
+                goTransport.GoTransport.instance.socket.send(JSON.stringify(this.toJSON()));
+                goTransport.GoTransport.instance.$timeout(function () {
+                    if (Message.promises[this.id].promise.$$state.status == 0) {
+                        console.log("Timed out");
+                        Message.promises[this.id].reject("Timed out");
+                    }
+                }.bind(this), timeout);
             }.bind(this));
-        };
-        Message.prototype.toJSON = function () {
+            return Message.promises[this.id].promise;
+        }
+        toJSON() {
             return Object.assign({}, this, {});
-        };
-        Message.fromJSON = function (json) {
+        }
+        static fromJSON(json) {
             if (typeof json === 'string') {
                 return JSON.parse(json, Message.reviver);
             }
             else {
-                var message = Object.create(Message.prototype);
+                let message = Object.create(Message.prototype);
                 return Object.assign(message, json, {});
             }
-        };
-        Message.reviver = function (key, value) {
+        }
+        static reviver(key, value) {
             return key === "" ? Message.fromJSON(value) : value;
-        };
-        Message.current_id = 0;
-        return Message;
-    }());
+        }
+    }
+    Message.current_id = 0;
     goTransport.Message = Message;
 })(goTransport || (goTransport = {}));
+var goTransport;
+(function (goTransport) {
+    class MessageHandler {
+        constructor(messageType) {
+            this.messageType = messageType;
+        }
+        getMessageType() {
+            return this.messageType;
+        }
+    }
+    goTransport.MessageHandler = MessageHandler;
+})(goTransport || (goTransport = {}));
+var goTransport;
+(function (goTransport) {
+    class MethodHandler extends goTransport.MessageHandler {
+        constructor(name, parameters) {
+            super(goTransport.MessageType.MessageTypeMethod);
+            this.name = name;
+            this.parameters = parameters;
+        }
+        validate() {
+            return null;
+        }
+        run() {
+            return null;
+        }
+        toJSON() {
+            return Object.assign({}, this, {});
+        }
+    }
+    goTransport.MethodHandler = MethodHandler;
+})(goTransport || (goTransport = {}));
+var Socket;
+(function (Socket) {
+    class SockJSClient {
+        constructor(url, delegate) {
+            this.delegate = delegate;
+            this.connection = new SockJS(url);
+            this.connection.onopen = function (e) { this.open(e); }.bind(this);
+            this.connection.onclose = function (e) { this.disconnect(e); }.bind(this);
+            this.connection.onmessage = function (e) { this.message(e); }.bind(this);
+        }
+        static getInstance(url, delegate) {
+            if (!SockJSClient.instance) {
+                SockJSClient.instance = new SockJSClient(url, delegate);
+            }
+            return SockJSClient.instance;
+        }
+        open(e) {
+            this.delegate.connected();
+        }
+        disconnect(e) {
+            this.delegate.disconnected(e.code, e.reason, e.wasClean);
+        }
+        message(e) {
+            this.delegate.message(e.data);
+        }
+        send(data) {
+            this.connection.send(data);
+        }
+        close() {
+            this.connection.close();
+        }
+    }
+    Socket.SockJSClient = SockJSClient;
+})(Socket || (Socket = {}));
+var Socket;
+(function (Socket) {
+    class Adapter {
+        static getSocket(type, url, delegate) {
+            switch (type) {
+                case "SockJSClient":
+                    return Socket.SockJSClient.getInstance(url, delegate);
+                default:
+                    throw ("Invalid socket type:" + type);
+            }
+        }
+    }
+    Socket.Adapter = Adapter;
+})(Socket || (Socket = {}));
 //# sourceMappingURL=goTransport-angular1.js.map
