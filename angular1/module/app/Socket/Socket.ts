@@ -1,14 +1,14 @@
 module Socket {
 
     export interface SocketDelegate {
-        connected(): any;
-        message(data: string): any;
-        disconnected(code: number, reason: string, wasClean: boolean): any;
+        connected(): void;
+        messaged(data: string): void;
+        disconnected(code: number, reason: string, wasClean: boolean): void;
     }
 
     export interface Socket {
-        send(data:string):any;
-        close():any;
+        send(data:string): void;
+        close(): void;
     }
 
     export class Adapter {

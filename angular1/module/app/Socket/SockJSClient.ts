@@ -1,5 +1,6 @@
 //Sick and tired of the sockJS typings. Can't get it to work, so any will do.
 declare var SockJS: any;
+
 module Socket {
     export class SockJSClient implements Socket {
         private static instance:SockJSClient;
@@ -31,7 +32,7 @@ module Socket {
         }
 
         private message(e:any) {//__SockJSClient.MessageEvent
-            this.delegate.message(e.data)
+            this.delegate.messaged(e.data)
         }
 
         send(data:string) {
