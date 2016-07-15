@@ -1,17 +1,20 @@
 var goTransport;
 (function (goTransport) {
     class Client {
-        constructor($q, $timeout) {
-            this.$q = $q;
-            this.$timeout = $timeout;
-            this.connected = $q.defer();
+        constructor() {
+            Client.instance = this;
+            this.connected = new goTransport.Promise();
             this.messageManager = new goTransport.MessageManager(this);
         }
         connect(url) {
             return this.messageManager.connect(url);
         }
-        method(methodName, parameters) {
-            return null;
+        method(name, parameters, timeout = 3000) {
+            let message = new goTransport.MessageMethod(name, parameters);
+            this.messageManager.send(message);
+            var promise = message.getPromise();
+            promise.setTimeOut(timeout);
+            return promise.promise;
         }
         onConnect() {
             return this.connected.promise;
@@ -26,18 +29,52 @@ var goTransport;
             this.type = type;
             this.id = Message.current_id++;
         }
+        getType() {
+            return this.type;
+        }
+        setReply(message) {
+            this.reply = message;
+        }
+        start() {
+            var error = this.validate();
+            if (error) {
+                console.error(error);
+                return false;
+            }
+            error = this.run();
+            if (error) {
+                console.error(error);
+                return false;
+            }
+            return true;
+        }
+        serialize() {
+            return this.type + Message.headerDelimiter + JSON.stringify(this.encode());
+        }
+        static unSerialize(data) {
+            var parts = data.split(Message.headerDelimiter);
+            if (parts[1] === undefined) {
+                console.warn("Invalid message", data);
+                return null;
+            }
+            return goTransport.MessageDefinition.get(parseInt(parts[0]), JSON.parse(parts[1]));
+        }
+        encode() {
+            return Object.assign({}, this, {});
+        }
     }
     Message.current_id = 0;
+    Message.headerDelimiter = " ";
     goTransport.Message = Message;
 })(goTransport || (goTransport = {}));
 var goTransport;
 (function (goTransport) {
     class MessageBuilder {
-        constructor(testType) {
-            this.testType = testType;
+        constructor(messageType) {
+            this.messageType = messageType;
         }
         build() {
-            return new this.testType();
+            return new this.messageType();
         }
     }
     goTransport.MessageBuilder = MessageBuilder;
@@ -50,16 +87,16 @@ var goTransport;
         MessageType[MessageType["MessageTypePub"] = 2] = "MessageTypePub";
     })(goTransport.MessageType || (goTransport.MessageType = {}));
     var MessageType = goTransport.MessageType;
-    class MessageDefinitions {
+    class MessageDefinition {
         static set(type, definition) {
             if (!definition || !definition.prototype) {
                 console.warn("Invalid message definition set for type", type);
                 return;
             }
-            MessageDefinitions.definitions[type] = definition;
+            MessageDefinition.definitions[type] = definition;
         }
         static get(type, data) {
-            var definition = MessageDefinitions.definitions[type];
+            var definition = MessageDefinition.definitions[type];
             if (definition === undefined) {
                 console.warn("Invalid messageType requested", type);
                 return null;
@@ -70,14 +107,15 @@ var goTransport;
             return message;
         }
     }
-    MessageDefinitions.definitions = Array();
-    goTransport.MessageDefinitions = MessageDefinitions;
+    MessageDefinition.definitions = Array();
+    goTransport.MessageDefinition = MessageDefinition;
 })(goTransport || (goTransport = {}));
 var goTransport;
 (function (goTransport) {
     class MessageManager {
         constructor(client) {
             this.client = client;
+            this.messages = [];
         }
         connect(url) {
             if (this.socket == null) {
@@ -85,18 +123,33 @@ var goTransport;
             }
             return this.client.connected.promise;
         }
-        message(data) {
-            console.log('send', data);
-            this.socket.send(data);
+        set(message) {
+            this.messages[message.id] = message;
+        }
+        get(message) {
+            return this.messages[message.id];
         }
         connected() {
             this.client.connected.resolve();
         }
+        send(message) {
+            this.set(message);
+            message.start();
+            this.socket.send(message.serialize());
+            console.log('sent', message.serialize());
+        }
         messaged(data) {
-            console.log('received', data);
+            let message = goTransport.Message.unSerialize(data);
+            if (!message) {
+                console.warn("Invalid message received.");
+                return;
+            }
+            message.setReply(this.get(message));
+            message.validate();
+            message.run();
         }
         disconnected(code, reason, wasClean) {
-            console.log('Disconnected');
+            console.warn('Disconnected', code);
         }
     }
     goTransport.MessageManager = MessageManager;
@@ -104,24 +157,47 @@ var goTransport;
 var goTransport;
 (function (goTransport) {
     class MessageMethod extends goTransport.Message {
-        constructor() {
+        constructor(name = null, parameters = null) {
             super(MessageMethod.type);
+            this.name = name;
+            this.parameters = parameters;
         }
         validate() {
             return null;
         }
         run() {
             console.log('ran');
+            this.promise = new goTransport.Promise();
             return null;
+        }
+        getPromise() {
+            return this.promise;
         }
     }
     MessageMethod.type = goTransport.MessageType.MessageTypeMethod;
     goTransport.MessageMethod = MessageMethod;
-    goTransport.MessageDefinitions.set(MessageMethod.type, MessageMethod);
-    var message = goTransport.MessageDefinitions.get(goTransport.MessageType.MessageTypeMethod, '{"name": "test"}');
-    console.log(message);
-    message = goTransport.MessageDefinitions.get(goTransport.MessageType.MessageTypeMethod, '{"name": "test"}');
-    console.log(message);
+    goTransport.MessageDefinition.set(MessageMethod.type, MessageMethod);
+})(goTransport || (goTransport = {}));
+var goTransport;
+(function (goTransport) {
+    class MessageMethodResult extends goTransport.Message {
+        constructor(result = false, parameters = null) {
+            super(goTransport.MessageMethod.type);
+            this.result = result;
+            this.parameters = parameters;
+        }
+        validate() {
+            console.log('validating method result', this.reply);
+            return null;
+        }
+        run() {
+            console.log('Running method result', this.reply);
+            return null;
+        }
+    }
+    MessageMethodResult.type = goTransport.MessageType.MessageTypeMethodResult;
+    goTransport.MessageMethodResult = MessageMethodResult;
+    goTransport.MessageDefinition.set(goTransport.MessageMethod.type, goTransport.MessageMethod);
 })(goTransport || (goTransport = {}));
 var Socket;
 (function (Socket) {
@@ -129,9 +205,9 @@ var Socket;
         constructor(url, delegate) {
             this.delegate = delegate;
             this.connection = new SockJS(url);
-            this.connection.onopen = function (e) { this.open(e); }.bind(this);
-            this.connection.onclose = function (e) { this.disconnect(e); }.bind(this);
-            this.connection.onmessage = function (e) { this.message(e); }.bind(this);
+            this.connection.onopen = this.open.bind(this);
+            this.connection.onclose = this.disconnect.bind(this);
+            this.connection.onmessage = this.message.bind(this);
         }
         static getInstance(url, delegate) {
             if (!SockJSClient.instance) {
@@ -175,14 +251,13 @@ var goTransport;
 (function (goTransport) {
     "use strict";
     class Angular1 extends goTransport.Client {
-        constructor($q, $timeout) {
-            super($q, $timeout);
-            this.$q = $q;
-            this.$timeout = $timeout;
+        constructor($q) {
+            goTransport.Promise.$q = $q;
+            super();
         }
-        static getInstance($q, $timeout) {
+        static getInstance($q) {
             if (!Angular1.instance)
-                Angular1.instance = new Angular1($q, $timeout);
+                Angular1.instance = new Angular1($q);
             return Angular1.instance;
         }
     }
@@ -192,6 +267,40 @@ var goTransport;
         .module("goTransport", ['bd.sockjs']);
     angular
         .module("goTransport")
-        .factory("goTransport", ["$q", "$timeout", Angular1.getInstance]);
+        .factory("goTransport", ["$q", Angular1.getInstance]);
+})(goTransport || (goTransport = {}));
+var goTransport;
+(function (goTransport) {
+    class Promise {
+        constructor(timeout = 0) {
+            this.timeout = timeout;
+            this.defer = Promise.$q.defer();
+            this.promise = this.defer.promise;
+            this.setTimeOut(timeout);
+        }
+        resolve(value) {
+            this.defer.notify(value);
+        }
+        reject(reason) {
+            this.defer.reject(reason);
+        }
+        notify(state) {
+            this.defer.notify(state);
+        }
+        setTimeOut(timeout = 3000) {
+            this.timeout = timeout;
+            if (this.timer)
+                clearTimeout(this.timer);
+            if (timeout >= 0) {
+                this.timer = setTimeout(this.timedOut.bind(this), timeout);
+            }
+        }
+        timedOut() {
+            if (this.promise.$$state.status == 0) {
+                this.defer.reject("Timed out. Exceeded:" + this.timeout);
+            }
+        }
+    }
+    goTransport.Promise = Promise;
 })(goTransport || (goTransport = {}));
 //# sourceMappingURL=goTransport-angular1.js.map

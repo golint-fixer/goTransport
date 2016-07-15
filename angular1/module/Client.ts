@@ -1,29 +1,30 @@
 module goTransport {
 
-    export class Client {
+    export abstract class Client {
 
         public connected: ng.IDeferred<{}>;
-        public static instance: Client;
+        protected static instance: Client;
         private messageManager: MessageManager;
 
-        constructor(public $q : ng.IQService, public $timeout : ng.ITimeoutService) {
-            this.connected = $q.defer();
+        constructor() {
+            Client.instance = this;
+            this.connected = new Promise();
             this.messageManager = new MessageManager(this);
         }
 
-        public connect(url : string): ng.IPromise<{}> {
+        public connect(url : string): IPromise<{}> {
             return this.messageManager.connect(url);
         }
 
-        public method(methodName: string, parameters: any[]): ng.IPromise<{}> {
-            // var message = new Message(
-            //     new MethodHandler(methodName, parameters)
-            // );
-            // return message.send();
-            return null;
+        public method(name: string, parameters: any[], timeout: number = 3000): IPromise<{}> {
+            let message = new MessageMethod(name, parameters);
+            this.messageManager.send(message);
+            var promise = message.getPromise();
+            promise.setTimeOut(timeout);
+            return promise.promise;
         }
 
-        public onConnect(): ng.IPromise<{}> {
+        public onConnect(): IPromise<{}> {
             return this.connected.promise;
         }
 

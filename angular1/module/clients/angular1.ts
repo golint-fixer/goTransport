@@ -4,13 +4,14 @@ module goTransport {
 
     export class Angular1 extends Client{
 
-        constructor(public $q : ng.IQService, public $timeout : ng.ITimeoutService) {
-            super($q, $timeout);
+        constructor($q : IQService) {
+            Promise.$q = $q;
+            super();
         }
 
-        public static getInstance($q : ng.IQService, $timeout : ng.ITimeoutService): Client {
+        public static getInstance($q : IQService): Client {
             if(!Angular1.instance)
-                Angular1.instance = new Angular1($q, $timeout);
+                Angular1.instance = new Angular1($q);
             return Angular1.instance;
         }
 
@@ -22,5 +23,5 @@ module goTransport {
         .module("goTransport", ['bd.sockjs']);
     angular
         .module("goTransport")
-        .factory("goTransport", ["$q", "$timeout", Angular1.getInstance]);
+        .factory("goTransport", ["$q", Angular1.getInstance]);
 }

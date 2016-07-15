@@ -11,9 +11,9 @@ module Socket {
         constructor(url:string, delegate:Socket.SocketDelegate) {
             this.delegate = delegate;
             this.connection = new SockJS(url);
-            this.connection.onopen = function(e:any) {this.open(e);}.bind(this);
-            this.connection.onclose = function(e:any) {this.disconnect(e);}.bind(this);
-            this.connection.onmessage = function(e:any) {this.message(e);}.bind(this);
+            this.connection.onopen = this.open.bind(this);
+            this.connection.onclose = this.disconnect.bind(this);
+            this.connection.onmessage = this.message.bind(this);
         }
 
         public static getInstance(url:string, delegate:Socket.SocketDelegate):Socket.Socket {

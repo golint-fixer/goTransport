@@ -1,11 +1,15 @@
 module goTransport {
 
-    export class MessageMethod extends Message{
-        static type = MessageType.MessageTypeMethod;
-        private name: string;
-        private parameters: Array<any>;
+    // interface MessageMethodJson {
+    //     name: string;
+    //     parameters:Array<any>;
+    // }
 
-        constructor() {
+    export class MessageMethod extends Message implements MessageMethodJson{
+        static type = MessageType.MessageTypeMethod;
+        private promise : Promise;
+
+        constructor(public name: string = null, public parameters: Array<any> = null) {
             super(MessageMethod.type);
         }
 
@@ -15,38 +19,23 @@ module goTransport {
 
         run(): Error {
             console.log('ran');
+            this.promise = new Promise();
             return null;
         }
 
+        public getPromise(): Promise {
+            return this.promise;
+        }
+
+        // public encode():MessageMethodJson {
+        //     let value = Object.assign({}, this, {
+        //         // convert fields that need converting
+        //     });
+        //     console.log('value', value);
+        //     return value;
+        // }
+
     }
 
-    MessageDefinitions.set(MessageMethod.type, MessageMethod);
-    //
-    var message = MessageDefinitions.get(MessageType.MessageTypeMethod, '{"name": "test"}');
-    console.log(message);
-
-    message = MessageDefinitions.get(MessageType.MessageTypeMethod, '{"name": "test"}');
-    console.log(message);
-    // console.log('id', message.id);
-    //
-    //
-    // class MessageBuilder<T extends Message> {
-    //     constructor(private testType:any) {
-    //         console.log('breakin my balls')
-    //     }
-    //
-    //     getNew() : T {
-    //         return new this.testType();
-    //     }
-    // }
-    //
-    // var test = new MessageBuilder<MessageMethod>(MessageMethod);
-    //
-    // var example = test.getNew();
-    // example.run();
-    // Object.assign(example, {name: "bever", parameters: ["heel smerig"]}, {//JSON.parse(data)
-    //     // convert fields that need converting
-    // });
-    // console.log(example);
-
+    MessageDefinition.set(MessageMethod.type, MessageMethod);
 }

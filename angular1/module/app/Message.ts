@@ -3,71 +3,59 @@ module goTransport {
     export abstract class Message{
         id:number;
         static current_id = 0;
+        protected reply: Message;
+        private static headerDelimiter = " ";
 
         constructor(private type : MessageType) {
             this.id = Message.current_id++;
+        }
+
+        public getType():MessageType {
+            return this.type;
+        }
+
+        public setReply(message: Message) {
+            this.reply = message;
         }
 
         abstract validate(): Error
 
         abstract run(): Error
 
-        //
-        // //Sends a to the SockJS server
-        // send(timeout: number=3000): ng.IPromise<{}> {
-        //     Message.promises[this.id] = Client.instance.$q.defer();
-        //
-        //     // Log_Print("Dispatching RPC message with ID %d and type %d.\n", g_rpc.messageID, type);
-        //     Client.instance.connectedPromise.promise.then(function() {
-        //         Client.instance.socket.send(JSON.stringify(this.toJSON()));
-        //
-        //         Client.instance.$timeout(function () {
-        //
-        //             if(Message.promises[this.id].promise.$$state.status == 0) {//Pending
-        //                 console.log("Timed out");
-        //                 Message.promises[this.id].reject("Timed out"); //reject the service in case of timeout
-        //             }
-        //
-        //         }.bind(this), timeout);
-        //
-        //     }.bind(this));
-        //     return Message.promises[this.id].promise;
-        // }
-        //
-        // // receive(): {
-        // //
-        // // }
-        //
+        public start(): boolean {
+            var error = this.validate();
+            if(error) {
+                console.error(error);
+                return false;
+            }
+            error = this.run();
+            if(error) {
+                console.error(error);
+                return false;
+            }
+            return true;
+        }
+
         // toJSON is automatically used by JSON.stringify
-        // toJSON(): Message {
-        //     // copy all fields from `this` to an empty object and return in
-        //     return Object.assign({}, this, {
-        //         // convert fields that need converting
-        //     });
-        // }
-        //
-        // // fromJSON is used to convert an serialized version
-        // // of the Message to an instance of the class
-        // fromJSON(json: Message|string): Message {
-        //     if (typeof json === 'string') {
-        //         // if it's a string, parse it first
-        //         return JSON.parse(json, Message.reviver);
-        //     } else {
-        //         // create an instance of the Message class
-        //         let message = Object.create(Message.prototype);
-        //         // copy all the fields from the json object
-        //         return Object.assign(message, json, {
-        //             // convert fields that need converting
-        //
-        //         });
-        //     }
-        // }
-        //
-        // // reviver can be passed as the second parameter to JSON.parse
-        // // to automatically call Message.fromJSON on the resulting value.
-        // static reviver(key: string, value: any): any {
-        //     return key === "" ? Message.fromJSON(value) : value;
-        // }
+        serialize(): string {
+            // copy all fields from `this` to an empty object and return in
+            return this.type + Message.headerDelimiter + JSON.stringify(this.encode());
+        }
+
+        static unSerialize(data : string):Message {
+            var parts = data.split(Message.headerDelimiter);
+            if(parts[1] === undefined) {
+                console.warn("Invalid message", data);
+                return null;
+            }
+            return MessageDefinition.get(parseInt(parts[0]), JSON.parse(parts[1]));
+        }
+
+        public encode():any {
+            return Object.assign({}, this, {
+                // convert fields that need converting
+            });
+        }
+
     }
-    
 }
