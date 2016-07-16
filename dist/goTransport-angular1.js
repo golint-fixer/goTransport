@@ -64,7 +64,7 @@ var goTransport;
         }
     }
     Message.current_id = 0;
-    Message.headerDelimiter = " ";
+    Message.headerDelimiter = "\f";
     goTransport.Message = Message;
 })(goTransport || (goTransport = {}));
 var goTransport;

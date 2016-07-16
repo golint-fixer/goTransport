@@ -5,7 +5,7 @@ module goTransport {
     //     parameters:Array<any>;
     // }
 
-    export class MessageMethod extends Message implements MessageMethodJson{
+    export class MessageMethod extends Message{
         static type = MessageType.MessageTypeMethod;
         private promise : Promise;
 

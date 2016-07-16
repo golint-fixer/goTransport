@@ -11,6 +11,7 @@ module goTransport {
         then<TResult>(successCallback: (promiseValue: T) => IPromise<TResult>|TResult, errorCallback?: (reason: any) => any, notifyCallback?: (state: any) => any): IPromise<TResult>;
         catch<TResult>(onRejected: (reason: any) => IPromise<TResult>|TResult): IPromise<TResult>;
         finally(finallyCallback: () => any): IPromise<T>;
+        $$state:any;
     }
 
     export interface IQService {

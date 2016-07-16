@@ -8,12 +8,12 @@ import (
 
 func main() {
 	http.Handle("/", http.FileServer(http.Dir("../../")))
-	transporter := transport.New("/ws")
-	transporter.Method("ping", ping)
+	transporter := transport.NewTransport("/ws")
+	transporter.SetRPCMethod("ping", ping)
 
 	log.Print("goTransport server spawning at port: 8081")
 	log.Print("Angular 1 example available at: localhost:8081/angular1/example/")
-	http.Handle("/ws/", transporter.GetHttpHandler())
+	http.Handle("/ws/", transporter.HttpHandler)
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
 

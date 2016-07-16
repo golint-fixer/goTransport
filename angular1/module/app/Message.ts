@@ -4,7 +4,7 @@ module goTransport {
         id:number;
         static current_id = 0;
         protected reply: Message;
-        private static headerDelimiter = " ";
+        private static headerDelimiter = "\f";
 
         constructor(private type : MessageType) {
             this.id = Message.current_id++;

@@ -3,37 +3,33 @@ package transport
 import (
 	"gopkg.in/igm/sockjs-go.v2/sockjs"
 	"net/http"
-	"encoding/json"
-	"log"
+	"github.com/iain17/goTransport/transport/Message"
 )
 
-type Transport struct {
-	HttpHandler http.Handler
-	methods map[string]RPCMethod
+type Transport interface {
+	Method(name string, method RPCMethod)
+	GetHttpHandler() http.Handler
 }
 
-func NewTransport(prefix string) *Transport {
-	transport := &Transport{
+type transport struct {
+	HttpHandler http.Handler
+	methods map[string]RPCMethod
+	messageManager Message.MessageManager
+}
+
+func New(prefix string) Transport {
+	transport := &transport{
 		methods: make(map[string]RPCMethod),
+		messageManager: Message.NewMessageManager(),
 	}
-	transport.HttpHandler = sockjs.NewHandler(prefix, sockjs.DefaultOptions, transport.listen)
+	transport.HttpHandler = sockjs.NewHandler(prefix, sockjs.DefaultOptions, transport.messageManager.Listen)
 	return transport
 }
 
-func (transport *Transport) listen(session sockjs.Session) {
-	for {
-		if msg, err := session.Recv(); err == nil {
-			var message Message
-			err = json.Unmarshal([]byte(msg), &message)
-			if err != nil {
-				log.Print(err)
-			}
-			message.Transport = transport
-			message.Session = session
-			message.Json = []byte(msg)
-			message.Call()
-			continue
-		}
-		break
-	}
+func (transport *transport) Method(name string, method RPCMethod) {
+
+}
+
+func (transport *transport) GetHttpHandler() http.Handler {
+	return transport.HttpHandler;
 }
