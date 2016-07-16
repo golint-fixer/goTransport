@@ -3,7 +3,6 @@ var goTransport;
     class Client {
         constructor() {
             Client.instance = this;
-            this.connected = new goTransport.Promise();
             this.messageManager = new goTransport.MessageManager(this);
         }
         connect(url) {
@@ -17,7 +16,7 @@ var goTransport;
             return promise.promise;
         }
         onConnect() {
-            return this.connected.promise;
+            return this.messageManager.getConnectedPromise();
         }
     }
     goTransport.Client = Client;
@@ -118,10 +117,14 @@ var goTransport;
             this.messages = [];
         }
         connect(url) {
+            this.connectedPromise = new goTransport.Promise();
             if (this.socket == null) {
                 this.socket = Socket.Adapter.getSocket("SockJSClient", url, this);
             }
-            return this.client.connected.promise;
+            return this.getConnectedPromise();
+        }
+        getConnectedPromise() {
+            return this.connectedPromise.promise;
         }
         set(message) {
             this.messages[message.id] = message;
@@ -130,13 +133,16 @@ var goTransport;
             return this.messages[message.id];
         }
         connected() {
-            this.client.connected.resolve();
+            console.log('connected');
+            this.connectedPromise.resolve();
         }
         send(message) {
-            this.set(message);
             message.start();
-            this.socket.send(message.serialize());
-            console.log('sent', message.serialize());
+            this.set(message);
+            this.getConnectedPromise().then(function () {
+                this.socket.send(message.serialize());
+                console.log('sent', message.serialize());
+            }.bind(this));
         }
         messaged(data) {
             let message = goTransport.Message.unSerialize(data);
@@ -145,8 +151,7 @@ var goTransport;
                 return;
             }
             message.setReply(this.get(message));
-            message.validate();
-            message.run();
+            message.start();
         }
         disconnected(code, reason, wasClean) {
             console.warn('Disconnected', code);
@@ -279,7 +284,7 @@ var goTransport;
             this.setTimeOut(timeout);
         }
         resolve(value) {
-            this.defer.notify(value);
+            this.defer.resolve(value);
         }
         reject(reason) {
             this.defer.reject(reason);
@@ -291,7 +296,7 @@ var goTransport;
             this.timeout = timeout;
             if (this.timer)
                 clearTimeout(this.timer);
-            if (timeout >= 0) {
+            if (timeout > 0) {
                 this.timer = setTimeout(this.timedOut.bind(this), timeout);
             }
         }

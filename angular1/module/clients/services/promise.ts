@@ -33,7 +33,7 @@ module goTransport {
         }
 
         resolve(value?:IPromise<{}>|{}):void {
-            this.defer.notify(value);
+            this.defer.resolve(value);
         }
 
         reject(reason?:any):void {
@@ -48,7 +48,7 @@ module goTransport {
             this.timeout = timeout;
             if(this.timer)
                 clearTimeout(this.timer);
-            if(timeout >= 0) {
+            if(timeout > 0) {
                 this.timer = setTimeout(this.timedOut.bind(this), timeout);
             }
         }

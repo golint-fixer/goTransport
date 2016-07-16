@@ -26,15 +26,6 @@ func (messageManager *messageManager) Listen(session sockjs.Session) {
 				continue
 			}
 			message.Start()
-			//var message Message
-			//err = json.Unmarshal([]byte(msg), &message)
-			//if err != nil {
-			//	log.Print(err)
-			//}
-			//message.Transport = transport
-			//message.Session = session
-			//message.Json = []byte(msg)
-			//message.Call()
 			continue
 		}
 		break

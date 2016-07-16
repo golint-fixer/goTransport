@@ -14,6 +14,8 @@ angular.module('goTransport-example', ['goTransport'])
 					return;
 				}
 				console.log(result);
+			}, function(err) {
+				console.error(err);
 			});
 		};
 	});

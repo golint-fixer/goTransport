@@ -4,6 +4,7 @@ import (
 	"log"
 	"strings"
 	"strconv"
+	"errors"
 )
 
 type MessageType int
@@ -15,12 +16,12 @@ const (
 )
 
 type IMessage interface {
-	//GetType() MessageType
+	GetType() MessageType
 	//setReply()
 	Validate() error
-	Run() (interface{}, error)
+	Run() error
 	Start() bool
-	//serialize() string
+	serialize() string
 }
 
 var current_id uint64
@@ -57,8 +58,9 @@ func UnSerialize(data string) IMessage {
 	return Get(MessageType(message_type), parts[1])
 }
 
-func (message Message) Encode() interface{} {
-	return nil
+func (message Message) serialize() string {
+	log.Print("MessageType has not implemented Encode()")
+	return ""
 }
 
 func (message Message) GetType() MessageType {
@@ -66,14 +68,21 @@ func (message Message) GetType() MessageType {
 }
 
 func (message Message) Validate() error {
-	return nil
+	return errors.New("MessageType has not implemented Validate()")
 }
 
-func (message Message) Run() (interface{}, error) {
-	return nil, nil
+func (message Message) Run() error {
+	return errors.New("MessageType has not implemented Run()")
 }
 
 func (message Message) Start() bool {
-	log.Print("Start message")
-	return false
+	if err := message.Validate(); err != nil {
+		log.Print(err)
+		return false
+	}
+	if err := message.Run(); err != nil {
+		log.Print(err)
+		return false
+	}
+	return true
 }

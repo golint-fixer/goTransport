@@ -3,23 +3,16 @@ package Message
 import "log"
 
 type MessageMethod struct {
-
+	Message
+	Name       string `json:"name"`
+	Parameters []interface{} `json:"parameters"`
 }
 
 func init() {
 	Set(MessageTypeMethod, MessageMethod{})
 }
 
-
 func (message MessageMethod) Validate() error {
+	log.Print(message.Name)
 	return nil
-}
-
-func (message MessageMethod) Run() (interface{}, error) {
-	return nil, nil
-}
-
-func (message MessageMethod) Start() bool {
-	log.Print("Start message")
-	return false
 }

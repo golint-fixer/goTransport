@@ -19,7 +19,7 @@
     "tests"
   ],
   "dependencies": {
-    "angular-sockjs": "^0.1.0",
-    "sockjs-client": "^1.1.1"
+    "sockjs-client": "^1.1.1",
+    "angular": "^1.5.7"
   }
 }

@@ -1,14 +1,13 @@
 module goTransport {
 
+    import IPromise = goTransport.IPromise;
     export abstract class Client {
 
-        public connected: ng.IDeferred<{}>;
         protected static instance: Client;
         private messageManager: MessageManager;
 
         constructor() {
             Client.instance = this;
-            this.connected = new Promise();
             this.messageManager = new MessageManager(this);
         }
 
@@ -25,7 +24,7 @@ module goTransport {
         }
 
         public onConnect(): IPromise<{}> {
-            return this.connected.promise;
+            return this.messageManager.getConnectedPromise();
         }
 
     }
