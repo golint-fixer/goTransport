@@ -20,7 +20,6 @@ type IMessage interface {
 	//setReply()
 	Validate() error
 	Run() error
-	Start() bool
 	serialize() string
 }
 
@@ -75,7 +74,7 @@ func (message Message) Run() error {
 	return errors.New("MessageType has not implemented Run()")
 }
 
-func (message Message) Start() bool {
+func Start(message IMessage) bool {
 	if err := message.Validate(); err != nil {
 		log.Print(err)
 		return false

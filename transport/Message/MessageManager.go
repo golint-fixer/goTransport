@@ -25,7 +25,7 @@ func (messageManager *messageManager) Listen(session sockjs.Session) {
 				log.Print("Invalid message")
 				continue
 			}
-			message.Start()
+			Start(message)
 			continue
 		}
 		break
