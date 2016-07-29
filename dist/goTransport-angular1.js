@@ -2,8 +2,8 @@ var goTransport;
 (function (goTransport) {
     class Client {
         constructor() {
+            this.messageManager = new goTransport.MessageManager();
             Client.instance = this;
-            this.messageManager = new goTransport.MessageManager(this);
         }
         connect(url) {
             return this.messageManager.connect(url);
@@ -83,7 +83,8 @@ var goTransport;
     (function (MessageType) {
         MessageType[MessageType["MessageTypeMethod"] = 0] = "MessageTypeMethod";
         MessageType[MessageType["MessageTypeMethodResult"] = 1] = "MessageTypeMethodResult";
-        MessageType[MessageType["MessageTypePub"] = 2] = "MessageTypePub";
+        MessageType[MessageType["MessageTypeError"] = 2] = "MessageTypeError";
+        MessageType[MessageType["MessageTypePub"] = 3] = "MessageTypePub";
     })(goTransport.MessageType || (goTransport.MessageType = {}));
     var MessageType = goTransport.MessageType;
     class MessageDefinition {
@@ -112,8 +113,7 @@ var goTransport;
 var goTransport;
 (function (goTransport) {
     class MessageManager {
-        constructor(client) {
-            this.client = client;
+        constructor() {
             this.messages = [];
         }
         connect(url) {

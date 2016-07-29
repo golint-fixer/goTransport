@@ -1,8 +1,17 @@
-package Message
+package lib
 
 import (
 	"sync"
 	"reflect"
+)
+
+type MessageType int
+
+const (
+	MessageTypeMethod MessageType = iota
+	MessageTypeMethodResult
+	MessageTypeError
+	MessageTypePub
 )
 
 var definitions map[MessageType]reflect.Type

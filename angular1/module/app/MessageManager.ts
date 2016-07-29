@@ -6,7 +6,7 @@ module goTransport {
         private messages : Array<Message>;
         private connectedPromise : Promise;
 
-        constructor(private client: Client) {
+        constructor() {
             this.messages = [];
         }
 

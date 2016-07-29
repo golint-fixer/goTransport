@@ -4,11 +4,10 @@ module goTransport {
     export abstract class Client {
 
         protected static instance: Client;
-        private messageManager: MessageManager;
+        private messageManager = new MessageManager();
 
         constructor() {
             Client.instance = this;
-            this.messageManager = new MessageManager(this);
         }
 
         public connect(url : string): IPromise<{}> {

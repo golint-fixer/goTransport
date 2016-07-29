@@ -1,0 +1,5 @@
+package messageType
+
+func Init() {
+
+}
