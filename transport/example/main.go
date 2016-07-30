@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"log"
 	"github.com/iain17/goTransport/transport"
+	"errors"
 )
 
 func main() {
@@ -18,7 +19,7 @@ func main() {
 }
 
 
-func ping(message string) string {
+func ping(message string) (string, error) {
 	log.Print("called", message)
-	return "bar"
+	return "bar", errors.New("test")
 }

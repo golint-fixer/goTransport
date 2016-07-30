@@ -9,6 +9,7 @@ module goTransport {
 
         validate(): Error {
             if(!(this.reply instanceof MessageMethod)) {
+                console.debug(this.reply);
                 return new Error("Invalid reply. Not messageMethod.");
             }
         }

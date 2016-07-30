@@ -23,11 +23,12 @@ module goTransport {
         }
 
         private set(message: Message) {
+            console.log('messageManager', 'set', message.id);
             this.messages[message.id] = message;
         }
 
         private get(message: Message): Message {
-            console.log('get', message.id, this.messages[message.id]);
+            console.log('messageManager', 'get', message.id, this.messages[message.id]);
             return this.messages[message.id];
         }
 
@@ -39,7 +40,8 @@ module goTransport {
         //Send
         public send(message : Message) {
             Message.current_id++;
-            
+            message.id = Message.current_id;
+
             message.start();
             this.set(message);
 
