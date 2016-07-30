@@ -27,6 +27,7 @@ module goTransport {
         }
 
         private get(message: Message): Message {
+            console.log('get', message.id, this.messages[message.id]);
             return this.messages[message.id];
         }
 
@@ -37,7 +38,8 @@ module goTransport {
 
         //Send
         public send(message : Message) {
-
+            Message.current_id++;
+            
             message.start();
             this.set(message);
 
@@ -50,6 +52,8 @@ module goTransport {
 
         //Receive
         messaged(data:string) {
+            console.debug('received', data);
+
             let message = Message.unSerialize(data);
             if(!message) {
                 console.warn("Invalid message received.");
@@ -57,7 +61,11 @@ module goTransport {
             }
 
             message.setReply(this.get(message));
-            message.start();
+            var error = message.start();
+            if (error != null) {
+                console.error(error);
+            }
+            
         }
 
         disconnected(code:number, reason:string, wasClean:boolean) {

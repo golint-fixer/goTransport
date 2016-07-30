@@ -26,7 +26,7 @@ var goTransport;
     class Message {
         constructor(type) {
             this.type = type;
-            this.id = Message.current_id++;
+            this.id = null;
         }
         getType() {
             return this.type;
@@ -37,15 +37,13 @@ var goTransport;
         start() {
             var error = this.validate();
             if (error) {
-                console.error(error);
-                return false;
+                return error;
             }
             error = this.run();
             if (error) {
-                console.error(error);
-                return false;
+                return error;
             }
-            return true;
+            return null;
         }
         serialize() {
             return this.type + Message.headerDelimiter + JSON.stringify(this.encode());
@@ -53,10 +51,11 @@ var goTransport;
         static unSerialize(data) {
             var parts = data.split(Message.headerDelimiter);
             if (parts[1] === undefined) {
-                console.warn("Invalid message", data);
+                console.warn("Invalid message. Invalid amount of parts", data);
                 return null;
             }
-            return goTransport.MessageDefinition.get(parseInt(parts[0]), JSON.parse(parts[1]));
+            console.log(parts);
+            return goTransport.MessageDefinition.get(parseInt(parts[0]), parts[1]);
         }
         encode() {
             return Object.assign({}, this, {});
@@ -130,6 +129,7 @@ var goTransport;
             this.messages[message.id] = message;
         }
         get(message) {
+            console.log('get', message.id, this.messages[message.id]);
             return this.messages[message.id];
         }
         connected() {
@@ -137,6 +137,7 @@ var goTransport;
             this.connectedPromise.resolve();
         }
         send(message) {
+            goTransport.Message.current_id++;
             message.start();
             this.set(message);
             this.getConnectedPromise().then(function () {
@@ -145,19 +146,49 @@ var goTransport;
             }.bind(this));
         }
         messaged(data) {
+            console.debug('received', data);
             let message = goTransport.Message.unSerialize(data);
             if (!message) {
                 console.warn("Invalid message received.");
                 return;
             }
             message.setReply(this.get(message));
-            message.start();
+            var error = message.start();
+            if (error != null) {
+                console.error(error);
+            }
         }
         disconnected(code, reason, wasClean) {
             console.warn('Disconnected', code);
         }
     }
     goTransport.MessageManager = MessageManager;
+})(goTransport || (goTransport = {}));
+var goTransport;
+(function (goTransport) {
+    class MessageError extends goTransport.Message {
+        constructor(reason) {
+            super(MessageError.type);
+            this.reason = reason;
+        }
+        validate() {
+            return null;
+        }
+        run() {
+            console.error(this.reason);
+            if ((this.reply instanceof goTransport.MessageMethod)) {
+                let promise = this.reply.getPromise();
+                if (promise) {
+                    console.debug(this);
+                    promise.reject(this.reason);
+                }
+            }
+            return null;
+        }
+    }
+    MessageError.type = goTransport.MessageType.MessageTypeError;
+    goTransport.MessageError = MessageError;
+    goTransport.MessageDefinition.set(MessageError.type, MessageError);
 })(goTransport || (goTransport = {}));
 var goTransport;
 (function (goTransport) {
@@ -187,22 +218,27 @@ var goTransport;
 (function (goTransport) {
     class MessageMethodResult extends goTransport.Message {
         constructor(result = false, parameters = null) {
-            super(goTransport.MessageMethod.type);
+            super(MessageMethodResult.type);
             this.result = result;
             this.parameters = parameters;
         }
         validate() {
-            console.log('validating method result', this.reply);
-            return null;
+            if (!(this.reply instanceof goTransport.MessageMethod)) {
+                return new Error("Invalid reply. Not messageMethod.");
+            }
         }
         run() {
-            console.log('Running method result', this.reply);
+            console.log('Result came back!', this.parameters);
+            let promise = this.reply.getPromise();
+            if (promise) {
+                promise.resolve.apply(promise, this.parameters);
+            }
             return null;
         }
     }
     MessageMethodResult.type = goTransport.MessageType.MessageTypeMethodResult;
     goTransport.MessageMethodResult = MessageMethodResult;
-    goTransport.MessageDefinition.set(goTransport.MessageMethod.type, goTransport.MessageMethod);
+    goTransport.MessageDefinition.set(MessageMethodResult.type, MessageMethodResult);
 })(goTransport || (goTransport = {}));
 var Socket;
 (function (Socket) {

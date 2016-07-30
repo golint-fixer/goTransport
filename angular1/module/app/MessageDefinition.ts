@@ -14,11 +14,13 @@ module goTransport {
                 console.warn("Invalid message definition set for type", type);
                 return
             }
+            // console.debug('message def: set', type, definition);
             MessageDefinition.definitions[type] = definition;
         }
 
         public static get(type : MessageType, data : string) : Message {
             var definition = MessageDefinition.definitions[type];
+            // console.debug('message def: get', type, data, definition);
             if(definition === undefined) {
                 console.warn("Invalid messageType requested", type);
                 return null;

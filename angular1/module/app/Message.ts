@@ -7,7 +7,7 @@ module goTransport {
         private static headerDelimiter = "\f";
 
         constructor(private type : MessageType) {
-            this.id = Message.current_id++;
+            this.id = null;
         }
 
         public getType():MessageType {
@@ -22,18 +22,16 @@ module goTransport {
 
         abstract run(): Error
 
-        public start(): boolean {
+        public start(): Error {
             var error = this.validate();
             if(error) {
-                console.error(error);
-                return false;
+                return error;
             }
             error = this.run();
             if(error) {
-                console.error(error);
-                return false;
+                return error;
             }
-            return true;
+            return null;
         }
 
         // toJSON is automatically used by JSON.stringify
@@ -45,10 +43,11 @@ module goTransport {
         static unSerialize(data : string):Message {
             var parts = data.split(Message.headerDelimiter);
             if(parts[1] === undefined) {
-                console.warn("Invalid message", data);
+                console.warn("Invalid message. Invalid amount of parts", data);
                 return null;
             }
-            return MessageDefinition.get(parseInt(parts[0]), JSON.parse(parts[1]));
+            console.log(parts);
+            return MessageDefinition.get(parseInt(parts[0]), parts[1]);
         }
 
         public encode():any {

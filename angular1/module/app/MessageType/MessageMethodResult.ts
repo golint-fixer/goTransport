@@ -4,20 +4,26 @@ module goTransport {
         static type = MessageType.MessageTypeMethodResult;
 
         constructor(private result: boolean = false, private parameters: Array<any> = null) {
-            super(MessageMethod.type);
+            super(MessageMethodResult.type);
         }
 
         validate(): Error {
-            console.log('validating method result', this.reply);
-            return null;
+            if(!(this.reply instanceof MessageMethod)) {
+                return new Error("Invalid reply. Not messageMethod.");
+            }
         }
 
         run(): Error {
-            console.log('Running method result', this.reply);
+            console.log('Result came back!', this.parameters);
+            let promise = (this.reply as MessageMethod).getPromise();
+            if(promise) {
+                promise.resolve.apply(promise, this.parameters);
+            }
+
             return null;
         }
 
     }
 
-    MessageDefinition.set(MessageMethod.type, MessageMethod);
+    MessageDefinition.set(MessageMethodResult.type, MessageMethodResult);
 }

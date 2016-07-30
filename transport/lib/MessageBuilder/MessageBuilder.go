@@ -1,19 +1,21 @@
-package Message
+package MessageBuilder
 
 import (
 	"log"
 	"reflect"
 	"encoding/json"
+	"github.com/iain17/goTransport/transport/lib/interfaces"
 )
 
-func build(definition reflect.Type, data string) IMessage {
+func Build(definition reflect.Type, data string) interfaces.IMessage {
 	_message := reflect.New(definition).Interface()
 	err := json.Unmarshal([]byte(data), &_message)
 	if err != nil {
 		log.Print("Error unmarshalling the message", err)
 		return nil
 	}
-	if message, ok := _message.(IMessage); ok {
+	__message := reflect.ValueOf(_message).Elem().Elem()
+	if message, ok := __message.Addr().Interface().(interfaces.IMessage); ok {
 		return message
 	}
 	log.Print("Could not cast message to IMessage interface. Invalid MessageType")

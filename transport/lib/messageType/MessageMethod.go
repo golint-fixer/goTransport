@@ -2,23 +2,34 @@ package messageType
 
 import (
 	"log"
-	"github.com/iain17/goTransport/transport/lib"
 	"errors"
 	"reflect"
 	"gopkg.in/igm/sockjs-go.v2/sockjs"
+	"github.com/iain17/goTransport/transport/lib/interfaces"
+	"github.com/iain17/goTransport/transport/lib/Message"
+	"github.com/iain17/goTransport/transport/lib/MessageDefinition"
 )
 
 type messageMethod struct {
-	lib.Message
+	Message.Message
 	Name       string `json:"name"`
 	Parameters []interface{} `json:"parameters"`
 }
 
+
 func init() {
-	lib.Set(lib.MessageTypeMethod, messageMethod{})
+	MessageDefinition.Set(NewMessageMethod("", nil))
 }
 
-func (message messageMethod) Validate(manager lib.MessageManager, session sockjs.Session) error {
+func NewMessageMethod(name string, parameters []interface{}) *messageMethod {
+	return &messageMethod{
+		Message: Message.NewMessage(MessageDefinition.MessageTypeMethod),
+		Name: name,
+		Parameters: parameters,
+	}
+}
+
+func (message *messageMethod) Validate(manager interfaces.MessageManager, session sockjs.Session) error {
 	log.Print(message.Name)
 	if manager.GetMethod(message.Name) == nil  {
 		return errors.New("[404]: Unknown method:"+message.Name)
@@ -26,11 +37,11 @@ func (message messageMethod) Validate(manager lib.MessageManager, session sockjs
 	return nil
 }
 
-func (message messageMethod) Run(manager lib.MessageManager, session sockjs.Session) error {
+func (message *messageMethod) Run(manager interfaces.MessageManager, session sockjs.Session) error {
 	defer func() {
 		// recover from panic if one occured. Set err to nil otherwise.
 		if (recover() != nil) {
-			manager.Send(newMessageError(errors.New("Panic whilst running method")))
+			message.Reply(NewMessageError(errors.New("Panic whilst running method")), manager, session)
 		}
 	}()
 
@@ -50,9 +61,6 @@ func (message messageMethod) Run(manager lib.MessageManager, session sockjs.Sess
 			result = append(result, value.Interface())
 		}
 	}
-	manager.Send(messageMethodResult{
-		Result: true,
-		Parameters: result,
-	})
+	message.Reply(NewMessageMethodResult(true, result), manager, session)
 	return 	nil
 }
