@@ -24,14 +24,14 @@ func NewMessageManager() interfaces.MessageManager {
 func (manager *messageManager) Listen(session sockjs.Session) {
 	for {
 		if msg, err := session.Recv(); err == nil {
-			message := Message.UnSerialize(msg)
+			message := Message.UnSerialize(msg, manager, &session)
 			if message == nil {
 				log.Print("Invalid message")
 				continue
 			}
-			error := Message.Start(message, manager, session)
+			error := Message.Start(message)
 			if error != nil {
-				message.Reply(messageType.NewMessageError(error), manager, session)
+				message.Reply(messageType.NewMessageError(error))
 			}
 			continue
 		}
@@ -39,7 +39,7 @@ func (manager *messageManager) Listen(session sockjs.Session) {
 	}
 }
 
-func (manager *messageManager) Send(message string, session sockjs.Session) {
-	session.Send(message)
+func (manager *messageManager) Send(message string, session *sockjs.Session) {
+	(*session).Send(message)
 	//log.Print("Send:", message)
 }

@@ -4,8 +4,6 @@ import (
 	"log"
 	"errors"
 	"reflect"
-	"gopkg.in/igm/sockjs-go.v2/sockjs"
-	"github.com/iain17/goTransport/transport/lib/interfaces"
 	"github.com/iain17/goTransport/transport/lib/Message"
 	"github.com/iain17/goTransport/transport/lib/MessageDefinition"
 )
@@ -29,23 +27,24 @@ func NewMessageMethod(name string, parameters []interface{}) *messageMethod {
 	}
 }
 
-func (message *messageMethod) Validate(manager interfaces.MessageManager, session sockjs.Session) error {
+func (message *messageMethod) Validate() error {
 	log.Print(message.Name)
-	if manager.GetMethod(message.Name) == nil  {
+
+	if message.GetManager().GetMethod(message.Name) == nil  {
 		return errors.New("[404]: Unknown method:"+message.Name)
 	}
 	return nil
 }
 
-func (message *messageMethod) Run(manager interfaces.MessageManager, session sockjs.Session) error {
+func (message *messageMethod) Run() error {
 	defer func() {
 		// recover from panic if one occured. Set err to nil otherwise.
 		if (recover() != nil) {
-			message.Reply(NewMessageError(errors.New("Panic whilst running method")), manager, session)
+			message.Reply(NewMessageError(errors.New("Panic whilst running method")))
 		}
 	}()
 
-	rpcMethod := reflect.ValueOf(manager.GetMethod(message.Name))
+	rpcMethod := reflect.ValueOf(message.GetManager().GetMethod(message.Name))
 	if len(message.Parameters) != rpcMethod.Type().NumIn() {
 		return errors.New("The number of parameters sent do not match the amount required.")
 	}
@@ -61,6 +60,6 @@ func (message *messageMethod) Run(manager interfaces.MessageManager, session soc
 			result = append(result, value.Interface())
 		}
 	}
-	message.Reply(NewMessageMethodResult(true, result), manager, session)
+	message.Reply(NewMessageMethodResult(true, result))
 	return 	nil
 }

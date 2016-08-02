@@ -1,11 +1,9 @@
 package messageType
 
 import (
-	"gopkg.in/igm/sockjs-go.v2/sockjs"
 	"log"
 	"github.com/iain17/goTransport/transport/lib/Message"
 	"github.com/iain17/goTransport/transport/lib/MessageDefinition"
-	"github.com/iain17/goTransport/transport/lib/interfaces"
 )
 
 type messageError struct {
@@ -24,11 +22,11 @@ func NewMessageError(reason error) *messageError {
 	}
 }
 
-func (message messageError) Validate(manager interfaces.MessageManager, session sockjs.Session) error {
+func (message messageError) Validate() error {
 	return nil
 }
 
-func (message messageError) Run(manager interfaces.MessageManager, session sockjs.Session) error {
+func (message messageError) Run() error {
 	log.Print(message.Reason)
 	return 	nil
 }

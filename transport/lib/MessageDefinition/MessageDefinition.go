@@ -4,7 +4,6 @@ import (
 	"sync"
 	"reflect"
 	"github.com/iain17/goTransport/transport/lib/interfaces"
-	"github.com/iain17/goTransport/transport/lib/MessageBuilder"
 )
 
 const (
@@ -27,10 +26,10 @@ func Set(definition interfaces.IMessage) {
 	definitions_mutex.Unlock()
 }
 
-func Get(messageType interfaces.MessageType, data string) interfaces.IMessage {
+func Get(messageType interfaces.MessageType, data string) reflect.Type {
 	definition := definitions[messageType]
 	if definition == nil {
 		return nil
 	}
-	return MessageBuilder.Build(definition, data)
+	return definition
 }
