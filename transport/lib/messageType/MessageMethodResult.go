@@ -1,7 +1,6 @@
 package messageType
 
 import (
-	"github.com/iain17/goTransport/transport/lib/MessageDefinition"
 	"github.com/iain17/goTransport/transport/lib/Message"
 )
 
@@ -12,12 +11,12 @@ type messageMethodResult struct {
 }
 
 func init() {
-	MessageDefinition.Set(NewMessageMethodResult(false, nil))
+	Message.Set(NewMessageMethodResult(false, nil))
 }
 
 func NewMessageMethodResult(result bool, parameters []interface{}) *messageMethodResult {
 	return &messageMethodResult{
-		Message: Message.NewMessage(MessageDefinition.MessageTypeMethodResult),
+		Message: Message.NewMessage(Message.MessageTypeMethodResult),
 		Result: result,
 		Parameters: parameters,
 	}

@@ -24,7 +24,8 @@ func NewMessageManager() interfaces.MessageManager {
 func (manager *messageManager) Listen(session sockjs.Session) {
 	for {
 		if msg, err := session.Recv(); err == nil {
-			message := Message.UnSerialize(msg, manager, &session)
+			message := Message.UnSerialize(msg)
+			message.Initialize(manager, &session)
 			if message == nil {
 				log.Print("Invalid message")
 				continue

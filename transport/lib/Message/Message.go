@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"gopkg.in/igm/sockjs-go.v2/sockjs"
 	"github.com/iain17/goTransport/transport/lib/interfaces"
-	"github.com/iain17/goTransport/transport/lib/MessageDefinition"
 	"encoding/json"
 	"github.com/iain17/goTransport/transport/lib/MessageBuilder"
 )
@@ -28,7 +27,7 @@ type Message struct {
 }
 
 func NewMessage(message_type interfaces.MessageType) Message {
-	log.Printf("NewMessage called: %d", current_id)
+	//log.Printf("NewMessage called: %d", current_id)
 	return Message{
 		Type: message_type,
 	}
@@ -38,7 +37,7 @@ func validate() interfaces.IMessage {
 	return &Message{}
 }
 
-func UnSerialize(data string, manager interfaces.MessageManager, session *sockjs.Session) interfaces.IMessage {
+func UnSerialize(data string) interfaces.IMessage {
 	parts := strings.Split(data, headerDelimiter)
 	if len(parts) != 2 {
 		log.Print("Invalid length:", len(parts))
@@ -49,12 +48,12 @@ func UnSerialize(data string, manager interfaces.MessageManager, session *sockjs
 		log.Print(err)
 		return nil
 	}
-	definition := MessageDefinition.Get(interfaces.MessageType(message_type), parts[1])
+	definition := Get(interfaces.MessageType(message_type))
 	if definition == nil {
 		log.Print("No definition")
 		return nil
 	}
-	return MessageBuilder.Build(definition, parts[1], manager, session)
+	return MessageBuilder.Build(definition, parts[1])
 }
 
 func serialize(message interfaces.IMessage) string {
@@ -100,11 +99,21 @@ func (message *Message) Run() error {
 }
 
 func (message *Message) Reply(replyMessage interfaces.IMessage) {
+	if(message.GetManager() == nil || message.GetSession() == nil) {
+		log.Print("MessageType %d has not been initialized.", message.GetType())
+		return
+	}
+
 	replyMessage.SetId(message.GetId())
 	message.manager.Send(serialize(replyMessage), message.session)
 }
 
 func (message *Message) Send() {
+	if(message.GetManager() == nil || message.GetSession() == nil) {
+		log.Print("MessageType %d has not been initialized.", message.GetType())
+		return
+	}
+
 	current_id++
 	message.SetId(current_id)
 	message.manager.Send(serialize(message), message.session)

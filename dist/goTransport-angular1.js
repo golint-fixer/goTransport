@@ -126,10 +126,11 @@ var goTransport;
             return this.connectedPromise.promise;
         }
         set(message) {
+            console.log('messageManager', 'set', message.id);
             this.messages[message.id] = message;
         }
         get(message) {
-            console.log('get', message.id, this.messages[message.id]);
+            console.log('messageManager', 'get', message.id, this.messages[message.id]);
             return this.messages[message.id];
         }
         connected() {
@@ -138,6 +139,7 @@ var goTransport;
         }
         send(message) {
             goTransport.Message.current_id++;
+            message.id = goTransport.Message.current_id;
             message.start();
             this.set(message);
             this.getConnectedPromise().then(function () {
@@ -224,6 +226,7 @@ var goTransport;
         }
         validate() {
             if (!(this.reply instanceof goTransport.MessageMethod)) {
+                console.debug(this.reply);
                 return new Error("Invalid reply. Not messageMethod.");
             }
         }

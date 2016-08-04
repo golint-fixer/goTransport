@@ -5,7 +5,6 @@ import (
 	"errors"
 	"reflect"
 	"github.com/iain17/goTransport/transport/lib/Message"
-	"github.com/iain17/goTransport/transport/lib/MessageDefinition"
 )
 
 type messageMethod struct {
@@ -16,12 +15,12 @@ type messageMethod struct {
 
 
 func init() {
-	MessageDefinition.Set(NewMessageMethod("", nil))
+	Message.Set(NewMessageMethod("", nil))
 }
 
 func NewMessageMethod(name string, parameters []interface{}) *messageMethod {
 	return &messageMethod{
-		Message: Message.NewMessage(MessageDefinition.MessageTypeMethod),
+		Message: Message.NewMessage(Message.MessageTypeMethod),
 		Name: name,
 		Parameters: parameters,
 	}

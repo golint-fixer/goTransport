@@ -1,4 +1,4 @@
-package MessageDefinition
+package Message
 
 import (
 	"sync"
@@ -7,10 +7,10 @@ import (
 )
 
 const (
-	MessageTypeMethod interfaces.MessageType = iota
+	MessageTypeTest interfaces.MessageType = iota
+	MessageTypeMethod
 	MessageTypeMethodResult
 	MessageTypeError
-	MessageTypePub
 )
 
 var definitions map[interfaces.MessageType]reflect.Type
@@ -26,7 +26,7 @@ func Set(definition interfaces.IMessage) {
 	definitions_mutex.Unlock()
 }
 
-func Get(messageType interfaces.MessageType, data string) reflect.Type {
+func Get(messageType interfaces.MessageType) reflect.Type {
 	definition := definitions[messageType]
 	if definition == nil {
 		return nil
