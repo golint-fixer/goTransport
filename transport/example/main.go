@@ -5,6 +5,7 @@ import (
 	"log"
 	"github.com/iain17/goTransport/transport"
 	"errors"
+	"github.com/iain17/goTransport/transport/lib/interfaces"
 )
 
 func main() {
@@ -19,7 +20,8 @@ func main() {
 }
 
 
-func ping(message string) (string, error) {
+func ping(session interfaces.Session, message string) (string, error) {
 	log.Print("called", message)
+	log.Print(session)
 	return "bar", errors.New("test")
 }

@@ -1,4 +1,4 @@
-//Sick and tired of the sockJS typings. Can't get it to work, so any will do.
+//Sick and tired of the sockJS typings. Can't get it to work, so any type will do.
 declare var SockJS: any;
 
 module Socket {

@@ -4,7 +4,7 @@ module goTransport {
     export abstract class Client {
 
         protected static instance: Client;
-        private messageManager = new MessageManager();
+        private messageManager = new Session();
 
         constructor() {
             Client.instance = this;
@@ -14,12 +14,16 @@ module goTransport {
             return this.messageManager.connect(url);
         }
 
-        public method(name: string, parameters: any[], timeout: number = 3000): IPromise<{}> {
+        public call(name: string, parameters: any[], timeout: number = 3000): IPromise<{}> {
             let message = new MessageMethod(name, parameters);
             this.messageManager.send(message);
             var promise = message.getPromise();
             promise.setTimeOut(timeout);
             return promise.promise;
+        }
+
+        public method(name: string) {
+            
         }
 
         public onConnect(): IPromise<{}> {

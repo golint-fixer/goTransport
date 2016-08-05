@@ -29,7 +29,7 @@ func NewMessageMethod(name string, parameters []interface{}) *messageMethod {
 func (message *messageMethod) Validate() error {
 	log.Print(message.Name)
 
-	if message.GetManager().GetMethod(message.Name) == nil  {
+	if message.GetSession().GetClient().GetMethod(message.Name) == nil  {
 		return errors.New("[404]: Unknown method:"+message.Name)
 	}
 	return nil
@@ -42,8 +42,9 @@ func (message *messageMethod) Run() error {
 			message.Reply(NewMessageError(errors.New("Panic whilst running method")))
 		}
 	}()
+	message.Parameters = append([]interface{}{message.GetSession()}, message.Parameters...)
 
-	rpcMethod := reflect.ValueOf(message.GetManager().GetMethod(message.Name))
+	rpcMethod := reflect.ValueOf(message.GetSession().GetClient().GetMethod(message.Name))
 	if len(message.Parameters) != rpcMethod.Type().NumIn() {
 		return errors.New("The number of parameters sent do not match the amount required.")
 	}

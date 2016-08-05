@@ -2,24 +2,82 @@ var goTransport;
 (function (goTransport) {
     class Client {
         constructor() {
-            this.messageManager = new goTransport.MessageManager();
+            this.messageManager = new goTransport.Session();
             Client.instance = this;
         }
         connect(url) {
             return this.messageManager.connect(url);
         }
-        method(name, parameters, timeout = 3000) {
+        call(name, parameters, timeout = 3000) {
             let message = new goTransport.MessageMethod(name, parameters);
             this.messageManager.send(message);
             var promise = message.getPromise();
             promise.setTimeOut(timeout);
             return promise.promise;
         }
+        method(name) {
+        }
         onConnect() {
             return this.messageManager.getConnectedPromise();
         }
     }
     goTransport.Client = Client;
+})(goTransport || (goTransport = {}));
+var goTransport;
+(function (goTransport) {
+    "use strict";
+    class Angular1 extends goTransport.Client {
+        constructor($q) {
+            goTransport.Promise.$q = $q;
+            super();
+        }
+        static getInstance($q) {
+            if (!Angular1.instance)
+                Angular1.instance = new Angular1($q);
+            return Angular1.instance;
+        }
+    }
+    goTransport.Angular1 = Angular1;
+    "use strict";
+    angular
+        .module("goTransport", ['bd.sockjs']);
+    angular
+        .module("goTransport")
+        .factory("goTransport", ["$q", Angular1.getInstance]);
+})(goTransport || (goTransport = {}));
+var goTransport;
+(function (goTransport) {
+    class Promise {
+        constructor(timeout = 0) {
+            this.timeout = timeout;
+            this.defer = Promise.$q.defer();
+            this.promise = this.defer.promise;
+            this.setTimeOut(timeout);
+        }
+        resolve(value) {
+            this.defer.resolve(value);
+        }
+        reject(reason) {
+            this.defer.reject(reason);
+        }
+        notify(state) {
+            this.defer.notify(state);
+        }
+        setTimeOut(timeout = 3000) {
+            this.timeout = timeout;
+            if (this.timer)
+                clearTimeout(this.timer);
+            if (timeout > 0) {
+                this.timer = setTimeout(this.timedOut.bind(this), timeout);
+            }
+        }
+        timedOut() {
+            if (this.promise.$$state.status == 0) {
+                this.defer.reject("Timed out. Exceeded:" + this.timeout);
+            }
+        }
+    }
+    goTransport.Promise = Promise;
 })(goTransport || (goTransport = {}));
 var goTransport;
 (function (goTransport) {
@@ -80,10 +138,10 @@ var goTransport;
 var goTransport;
 (function (goTransport) {
     (function (MessageType) {
-        MessageType[MessageType["MessageTypeMethod"] = 0] = "MessageTypeMethod";
-        MessageType[MessageType["MessageTypeMethodResult"] = 1] = "MessageTypeMethodResult";
-        MessageType[MessageType["MessageTypeError"] = 2] = "MessageTypeError";
-        MessageType[MessageType["MessageTypePub"] = 3] = "MessageTypePub";
+        MessageType[MessageType["MessageTypeTest"] = 0] = "MessageTypeTest";
+        MessageType[MessageType["MessageTypeMethod"] = 1] = "MessageTypeMethod";
+        MessageType[MessageType["MessageTypeMethodResult"] = 2] = "MessageTypeMethodResult";
+        MessageType[MessageType["MessageTypeError"] = 3] = "MessageTypeError";
     })(goTransport.MessageType || (goTransport.MessageType = {}));
     var MessageType = goTransport.MessageType;
     class MessageDefinition {
@@ -111,7 +169,7 @@ var goTransport;
 })(goTransport || (goTransport = {}));
 var goTransport;
 (function (goTransport) {
-    class MessageManager {
+    class Session {
         constructor() {
             this.messages = [];
         }
@@ -164,7 +222,7 @@ var goTransport;
             console.warn('Disconnected', code);
         }
     }
-    goTransport.MessageManager = MessageManager;
+    goTransport.Session = Session;
 })(goTransport || (goTransport = {}));
 var goTransport;
 (function (goTransport) {
@@ -291,60 +349,4 @@ var Socket;
     }
     Socket.Adapter = Adapter;
 })(Socket || (Socket = {}));
-var goTransport;
-(function (goTransport) {
-    "use strict";
-    class Angular1 extends goTransport.Client {
-        constructor($q) {
-            goTransport.Promise.$q = $q;
-            super();
-        }
-        static getInstance($q) {
-            if (!Angular1.instance)
-                Angular1.instance = new Angular1($q);
-            return Angular1.instance;
-        }
-    }
-    goTransport.Angular1 = Angular1;
-    "use strict";
-    angular
-        .module("goTransport", ['bd.sockjs']);
-    angular
-        .module("goTransport")
-        .factory("goTransport", ["$q", Angular1.getInstance]);
-})(goTransport || (goTransport = {}));
-var goTransport;
-(function (goTransport) {
-    class Promise {
-        constructor(timeout = 0) {
-            this.timeout = timeout;
-            this.defer = Promise.$q.defer();
-            this.promise = this.defer.promise;
-            this.setTimeOut(timeout);
-        }
-        resolve(value) {
-            this.defer.resolve(value);
-        }
-        reject(reason) {
-            this.defer.reject(reason);
-        }
-        notify(state) {
-            this.defer.notify(state);
-        }
-        setTimeOut(timeout = 3000) {
-            this.timeout = timeout;
-            if (this.timer)
-                clearTimeout(this.timer);
-            if (timeout > 0) {
-                this.timer = setTimeout(this.timedOut.bind(this), timeout);
-            }
-        }
-        timedOut() {
-            if (this.promise.$$state.status == 0) {
-                this.defer.reject("Timed out. Exceeded:" + this.timeout);
-            }
-        }
-    }
-    goTransport.Promise = Promise;
-})(goTransport || (goTransport = {}));
 //# sourceMappingURL=goTransport-angular1.js.map

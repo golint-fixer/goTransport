@@ -1,9 +1,9 @@
 module goTransport {
     export enum MessageType {
+        MessageTypeTest,
         MessageTypeMethod,
         MessageTypeMethodResult,
-        MessageTypeError,
-        MessageTypePub
+        MessageTypeError
     }
     
     export class MessageDefinition{

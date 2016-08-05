@@ -1,7 +1,7 @@
 module goTransport {
     import SocketDelegate = Socket.SocketDelegate;
 
-    export class MessageManager implements SocketDelegate{
+    export class Session implements SocketDelegate{
         public socket: Socket.Socket;
         private messages : Array<Message>;
         private connectedPromise : Promise;

@@ -8,7 +8,7 @@ angular.module('goTransport-example', ['goTransport'])
 
 		$scope.pong = '';
 		$scope.ping = function() {
-			goTransport.method('ping', ['hai']).then(function(result, err) {
+			goTransport.call('ping', ['hai']).then(function(result, err) {
 				if(err) {
 					console.error(err);
 					return;

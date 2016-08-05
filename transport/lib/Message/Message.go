@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"errors"
 	"fmt"
-	"gopkg.in/igm/sockjs-go.v2/sockjs"
 	"github.com/iain17/goTransport/transport/lib/interfaces"
 	"encoding/json"
 	"github.com/iain17/goTransport/transport/lib/MessageBuilder"
@@ -22,8 +21,7 @@ func init() {
 type Message struct {
 	Id uint64 `json:"id"`
 	Type interfaces.MessageType `json:"type"`
-	manager interfaces.MessageManager `json:"-"`
-	session *sockjs.Session `json:"-"`
+	session interfaces.Session `json:"-"`
 }
 
 func NewMessage(message_type interfaces.MessageType) Message {
@@ -50,7 +48,7 @@ func UnSerialize(data string) interfaces.IMessage {
 	}
 	definition := Get(interfaces.MessageType(message_type))
 	if definition == nil {
-		log.Print("No definition")
+		log.Print("No definition for type: %d", interfaces.MessageType(message_type))
 		return nil
 	}
 	return MessageBuilder.Build(definition, parts[1])
@@ -65,16 +63,11 @@ func serialize(message interfaces.IMessage) string {
 	return strconv.Itoa(int(message.GetType())) + headerDelimiter + string(json)
 }
 
-func (message *Message) Initialize(manager interfaces.MessageManager, session *sockjs.Session) {
-	message.manager = manager
+func (message *Message) Initialize(session interfaces.Session) {
 	message.session = session
 }
 
-func (message *Message) GetManager() interfaces.MessageManager {
-	return message.manager
-}
-
-func (message *Message) GetSession() *sockjs.Session {
+func (message *Message) GetSession() interfaces.Session {
 	return message.session
 }
 
@@ -99,28 +92,28 @@ func (message *Message) Run() error {
 }
 
 func (message *Message) Reply(replyMessage interfaces.IMessage) {
-	if(message.GetManager() == nil || message.GetSession() == nil) {
+	if(message.GetSession() == nil) {
 		log.Print("MessageType %d has not been initialized.", message.GetType())
 		return
 	}
 
 	replyMessage.SetId(message.GetId())
-	message.manager.Send(serialize(replyMessage), message.session)
+	message.session.Send(serialize(replyMessage))
 }
 
 func (message *Message) Send() {
-	if(message.GetManager() == nil || message.GetSession() == nil) {
+	if(message.GetSession() == nil) {
 		log.Print("MessageType %d has not been initialized.", message.GetType())
 		return
 	}
 
 	current_id++
 	message.SetId(current_id)
-	message.manager.Send(serialize(message), message.session)
+	message.session.Send(serialize(message))
 }
 
 func Start(message interfaces.IMessage) error {
-	if(message.GetManager() == nil || message.GetSession() == nil) {
+	if(message.GetSession() == nil) {
 		return errors.New(fmt.Sprint("MessageType %d has not been initialized.", message.GetType()))
 	}
 
