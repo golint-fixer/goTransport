@@ -8,5 +8,4 @@ before_install:
   - cd transport
   - go get -t ./...
 script:
-  - cd transport
-  - $HOME/gopath/bin/goveralls -service=travis-ci
+  - cd transport; $HOME/gopath/bin/goveralls -service=travis-ci
