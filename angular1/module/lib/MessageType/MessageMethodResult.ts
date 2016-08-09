@@ -7,21 +7,39 @@ module goTransport {
             super(MessageMethodResult.type);
         }
 
-        validate(): Error {
-            if(!(this.reply instanceof MessageMethod)) {
-                console.debug(this.reply);
-                return new Error("Invalid reply. Not messageMethod.");
-            }
+        Sending(): Error {
+            return null;
         }
 
-        run(): Error {
+        Received(): Error {
+            if(!(this.previousMessage instanceof MessageMethod)) {
+                return new Error("Invalid previousMessage. Not messageMethod.");
+            }
+
             console.log('Result came back!', this.parameters);
-            let promise = (this.reply as MessageMethod).getPromise();
+            let promise = (this.previousMessage as MessageMethod).getPromise();
             if(promise) {
                 promise.resolve.apply(promise, this.parameters);
             }
 
             return null;
+        }
+
+        public GetResult():boolean {
+            return this.result;
+        }
+
+        public GetParameters(): Array<any> {
+            return this.parameters;
+        }
+
+        public toJSON() : any {
+            return {
+                id: this.GetId(),
+                type: this.GetType(),
+                result: this.GetResult(),
+                parameters: this.GetParameters()
+            }
         }
 
     }

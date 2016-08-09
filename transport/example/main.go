@@ -20,8 +20,15 @@ func main() {
 }
 
 
-func ping(session interfaces.Session, message string) (string, error) {
-	log.Print("called", message)
-	log.Print(session)
+func ping(session interfaces.CallableSession, message string) (string, error) {
+	log.Print("called with parameter: ", message)
+
+	log.Print("Calling example method client side.")
+	session.Call("example", []interface{}{
+		"A test",
+		1337,
+	})
+
+	log.Print("Returning a previousMessage")
 	return "bar", errors.New("test")
 }

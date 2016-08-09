@@ -12,9 +12,9 @@ type IMessage interface {
 	GetId() uint64
 	GetType() MessageType
 	//setReply()
-	Validate() error
-	Run() error
+	Sending() error
+	Received() error
 	Reply(replyMessage IMessage)
-	Send()
+	//Send()
 	//serialize() string
 }

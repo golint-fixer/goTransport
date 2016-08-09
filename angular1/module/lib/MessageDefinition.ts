@@ -19,16 +19,16 @@ module goTransport {
         }
 
         public static get(type : MessageType, data : string) : Message {
-            var definition = MessageDefinition.definitions[type];
+            let definition = MessageDefinition.definitions[type];
             // console.debug('message def: get', type, data, definition);
             if(definition === undefined) {
                 console.warn("Invalid messageType requested", type);
                 return null;
             }
-
+            
             let messageBuilder = new MessageBuilder<definition>(definition);
             var message = messageBuilder.build();
-            Object.assign(message, JSON.parse(data), {
+            (Object as any).assign(message, JSON.parse(data), {
                 // convert fields that need converting
             });
             return message;

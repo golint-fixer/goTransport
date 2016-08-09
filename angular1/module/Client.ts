@@ -1,35 +1,41 @@
 module goTransport {
-
     import IPromise = goTransport.IPromise;
+
     export abstract class Client {
 
         protected static instance: Client;
-        private messageManager = new Session();
+        private session : Session;
+        private methods: { [name: string] : Function; } = {};
 
         constructor() {
             Client.instance = this;
+            this.session = new Session(this);
         }
 
         public connect(url : string): IPromise<{}> {
-            return this.messageManager.connect(url);
+            return this.session.connect(url);
         }
 
         public call(name: string, parameters: any[], timeout: number = 3000): IPromise<{}> {
             let message = new MessageMethod(name, parameters);
-            this.messageManager.send(message);
+            message.Initialize(this.session);
+            Message.send(message);
             var promise = message.getPromise();
             promise.setTimeOut(timeout);
             return promise.promise;
         }
 
-        public method(name: string) {
-            
+        public method(name: string, method: Function) {
+            this.methods[name] = method;
+        }
+
+        public getMethod(name:string): Function {
+            return this.methods[name];
         }
 
         public onConnect(): IPromise<{}> {
-            return this.messageManager.getConnectedPromise();
+            return this.session.getConnectedPromise();
         }
 
     }
-
 }

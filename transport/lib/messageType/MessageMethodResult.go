@@ -22,10 +22,10 @@ func NewMessageMethodResult(result bool, parameters []interface{}) *messageMetho
 	}
 }
 
-func (message messageMethodResult) Validate() error {
+func (message messageMethodResult) Sending() error {
 	return nil
 }
 
-func (message messageMethodResult) Run() error {
+func (message messageMethodResult) Received() error {
 	return 	nil
 }

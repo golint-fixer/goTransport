@@ -8,22 +8,33 @@ module goTransport {
             super(MessageError.type);
         }
 
-        validate(): Error {
+        public GetReason():string {
+            return this.reason;
+        }
+
+        Sending(): Error {
             return null;
         }
 
-        run(): Error {
+        Received(): Error {
             console.error(this.reason);
 
-            //On error
-            if((this.reply instanceof MessageMethod)) {
-                let promise = (this.reply as MessageMethod).getPromise();
+            //TODO: On error method maybe?
+            if((this.previousMessage instanceof MessageMethod)) {
+                let promise = (this.previousMessage as MessageMethod).getPromise();
                 if(promise) {
-                    console.debug(this);
                     promise.reject(this.reason);
                 }
             }
             return null;
+        }
+
+        public toJSON() : any {
+            return {
+                id: this.GetId(),
+                type: this.GetType(),
+                reason: this.GetReason()
+            }
         }
     }
 

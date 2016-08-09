@@ -29,10 +29,11 @@ func New(prefix string) interfaces.Client {
 }
 
 func (client *client) Listen(socket sockjs.Session) {
-	manager := Session.NewSession(socket, client)
+	session := Session.NewSession(socket, client)
 	for {
 		if msg, err := socket.Recv(); err == nil {
-			manager.Messaged(msg)
+			go session.Messaged(msg)
+			continue
 		}
 		break
 	}
@@ -40,4 +41,18 @@ func (client *client) Listen(socket sockjs.Session) {
 
 func (client *client) GetHttpHandler() http.Handler {
 	return client.HttpHandler;
+}
+
+func (client *client) Method(name string, method interfaces.CallableMethod) {
+	client.methods_mutex.Lock()
+	client.methods[name] = method
+	client.methods_mutex.Unlock()
+}
+
+func (client *client) GetMethod(name string) interfaces.CallableMethod {
+	if a, ok := client.methods[name]; ok {
+		return a
+	}
+
+	return nil
 }

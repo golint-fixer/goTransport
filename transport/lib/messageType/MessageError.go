@@ -21,11 +21,11 @@ func NewMessageError(reason error) *messageError {
 	}
 }
 
-func (message messageError) Validate() error {
+func (message messageError) Sending() error {
 	return nil
 }
 
-func (message messageError) Run() error {
+func (message messageError) Received() error {
 	log.Print(message.Reason)
 	return 	nil
 }

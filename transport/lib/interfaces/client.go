@@ -13,7 +13,15 @@ type Client interface {
 }
 
 type Session interface {
+	CallableSession
 	Messaged(data string)
 	Send(message string)
 	GetClient() Client
+	GetCurrentId() uint64
+	SetCurrentId(id uint64)
+	IncrementCurrentId()
+}
+
+type CallableSession interface {
+	Call(name string, parameters []interface{})
 }

@@ -1,7 +1,6 @@
 package messageType
 
 import (
-	"log"
 	"errors"
 	"reflect"
 	"github.com/iain17/goTransport/transport/lib/Message"
@@ -26,25 +25,31 @@ func NewMessageMethod(name string, parameters []interface{}) *messageMethod {
 	}
 }
 
-func (message *messageMethod) Validate() error {
-	log.Print(message.Name)
-
-	if message.GetSession().GetClient().GetMethod(message.Name) == nil  {
-		return errors.New("[404]: Unknown method:"+message.Name)
-	}
+func (message *messageMethod) Sending() error {
 	return nil
 }
 
-func (message *messageMethod) Run() error {
+//Received a request to call a method on our side. Figure out which method it is, and dynamically call it with the sent along parameters.
+func (message *messageMethod) Received() error {
+	//Catch any panics
 	defer func() {
 		// recover from panic if one occured. Set err to nil otherwise.
 		if (recover() != nil) {
 			message.Reply(NewMessageError(errors.New("Panic whilst running method")))
 		}
 	}()
+
+	//Prepend the session to the parameters
 	message.Parameters = append([]interface{}{message.GetSession()}, message.Parameters...)
 
-	rpcMethod := reflect.ValueOf(message.GetSession().GetClient().GetMethod(message.Name))
+	//Get the requested method
+	method := message.GetSession().GetClient().GetMethod(message.Name)
+	if method == nil  {
+		return errors.New("[404]: Unknown method:"+message.Name)
+	}
+	rpcMethod := reflect.ValueOf(method)
+
+	//Setup the sent parameters
 	if len(message.Parameters) != rpcMethod.Type().NumIn() {
 		return errors.New("The number of parameters sent do not match the amount required.")
 	}
@@ -60,6 +65,8 @@ func (message *messageMethod) Run() error {
 			result = append(result, value.Interface())
 		}
 	}
+
+	//Reply with the returned result by the called method
 	message.Reply(NewMessageMethodResult(true, result))
 	return 	nil
 }

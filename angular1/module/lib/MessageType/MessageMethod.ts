@@ -1,10 +1,5 @@
 module goTransport {
 
-    // interface MessageMethodJson {
-    //     name: string;
-    //     parameters:Array<any>;
-    // }
-
     export class MessageMethod extends Message{
         static type = MessageType.MessageTypeMethod;
         private promise : Promise;
@@ -13,13 +8,20 @@ module goTransport {
             super(MessageMethod.type);
         }
 
-        validate(): Error {
+        Sending(): Error {
+            this.promise = new Promise();
             return null;
         }
 
-        run(): Error {
-            console.log('ran');
-            this.promise = new Promise();
+        Received(): Error {
+            console.log('Received request to call a method', this.name);
+            let method = this.GetSession().GetClient().getMethod(this.name);
+
+            if(method != null) {
+                let result = method.apply(this, this.parameters);
+                console.debug('replying back with result:', result);
+                this.Reply(new MessageMethodResult(true, result));
+            }
             return null;
         }
 
@@ -27,13 +29,22 @@ module goTransport {
             return this.promise;
         }
 
-        // public encode():MessageMethodJson {
-        //     let value = Object.assign({}, this, {
-        //         // convert fields that need converting
-        //     });
-        //     console.log('value', value);
-        //     return value;
-        // }
+        public GetName():string {
+            return this.name;
+        }
+
+        public GetParameters():Array<any> {
+            return this.parameters;
+        }
+
+        public toJSON() : any {
+            return {
+                id: this.GetId(),
+                type: this.GetType(),
+                name: this.GetName(),
+                parameters: this.GetParameters()
+            }
+        }
 
     }
 
