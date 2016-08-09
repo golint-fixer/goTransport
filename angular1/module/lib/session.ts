@@ -5,9 +5,28 @@ module goTransport {
         public socket: Socket.Socket;
         private messages : Array<Message>;
         private connectedPromise : Promise;
+        private currentId = 0;
+        private client : Client;
 
-        constructor() {
+        constructor(client : Client) {
             this.messages = [];
+            this.client = client;
+        }
+
+        public GetCurrentId(): number {
+            return this.currentId
+        }
+
+        public GetClient(): Client {
+            return this.client;
+        }
+
+        public SetCurrentId(id:number) {
+            this.currentId = id
+        }
+
+        public IncrementCurrentId() {
+            this.currentId++
         }
 
         public connect(url : string): IPromise<{}> {
@@ -22,13 +41,13 @@ module goTransport {
             return this.connectedPromise.promise;
         }
 
-        private set(message: Message) {
-            console.log('messageManager', 'set', message.id);
+        public setPreviousMessage(message: Message) {
+            console.log('messageManager', 'setPreviousMessage', message.id);
             this.messages[message.id] = message;
         }
 
-        private get(message: Message): Message {
-            console.log('messageManager', 'get', message.id, this.messages[message.id]);
+        private getPreviousMessage(message: Message): Message {
+            console.log('messageManager', 'getPreviousMessage', message.id, this.messages[message.id]);
             return this.messages[message.id];
         }
 
@@ -37,39 +56,36 @@ module goTransport {
             this.connectedPromise.resolve();
         }
 
-        //Send
-        public send(message : Message) {
-            Message.current_id++;
-            message.id = Message.current_id;
-
-            message.start();
-            this.set(message);
-
-            //Send it
+        //Send the message to the server
+        public Send(message : string) {
             this.getConnectedPromise().then(function() {
-                this.socket.send(message.serialize());
-                console.log('sent', message.serialize());
+                this.socket.send(message);
+                console.log('sent', message);
             }.bind(this));
         }
 
-        //Receive
+        //Receive a message from the server
         messaged(data:string) {
             console.debug('received', data);
 
             let message = Message.unSerialize(data);
+            message.Initialize(this);
             if(!message) {
                 console.warn("Invalid message received.");
                 return;
             }
 
-            message.setReply(this.get(message));
-            var error = message.start();
+            //Set the previous message that was sent for this message id.
+            message.setPreviousMessage(this.getPreviousMessage(message));
+            var error = message.Received();
             if (error != null) {
                 console.error(error);
             }
             
         }
 
+        //On disconnect
+        //TODO: Reconnect?
         disconnected(code:number, reason:string, wasClean:boolean) {
             console.warn('Disconnected', code)
         }

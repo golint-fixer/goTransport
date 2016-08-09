@@ -6,5 +6,4 @@ install:
   - go get -t ./...
 
 script:
-  - PATH="$HOME/gopath/bin:$PATH"
-  - script/coverage --coveralls
+  - cd transport; go test -v ./...
