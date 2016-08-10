@@ -1,4 +1,4 @@
-package Message
+package lib
 
 import (
 	"sync"
@@ -20,13 +20,13 @@ func init() {
 	definitions = make(map[interfaces.MessageType]reflect.Type)
 }
 
-func Set(definition interfaces.IMessage) {
+func SetMessageDefinition(definition interfaces.IMessage) {
 	definitions_mutex.Lock()
 	definitions[definition.GetType()] = reflect.TypeOf(definition)
 	definitions_mutex.Unlock()
 }
 
-func Get(messageType interfaces.MessageType) reflect.Type {
+func GetMessageDefinition(messageType interfaces.MessageType) reflect.Type {
 	definition := definitions[messageType]
 	if definition == nil {
 		return nil

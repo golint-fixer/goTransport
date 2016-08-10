@@ -1,5 +1,0 @@
-package messageType
-
-func Init() {
-
-}

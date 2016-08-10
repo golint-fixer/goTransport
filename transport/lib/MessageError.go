@@ -1,24 +1,26 @@
-package messageType
+package lib
 
 import (
 	"log"
-	"github.com/iain17/goTransport/transport/lib/Message"
 )
 
 type messageError struct {
-	Message.Message
-	Reason error `json:"reason"`
+	Message
+	Reason string `json:"reason"`
 }
 
 func init() {
-	Message.Set(NewMessageError(nil))
+	SetMessageDefinition(NewMessageError(nil))
 }
 
 func NewMessageError(reason error) *messageError {
-	return &messageError{
-		Message: Message.NewMessage(Message.MessageTypeError),
-		Reason: reason,
+	message := &messageError{
+		Message: NewMessage(MessageTypeError),
 	}
+	if reason != nil {
+		message.Reason = reason.Error()
+	}
+	return message
 }
 
 func (message messageError) Sending() error {

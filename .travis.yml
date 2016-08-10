@@ -7,4 +7,4 @@ before_install:
   - go get golang.org/x/tools/cmd/cover
   - cd transport; go get -t ./...;
 script:
-  - cd "$HOME/gopath/src/github.com/iain17/goTransport/transport"; $HOME/gopath/bin/goveralls -service=travis-ci
+  - cd "transport"; $HOME/gopath/bin/goveralls -service=travis-ci -v

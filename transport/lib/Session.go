@@ -1,12 +1,11 @@
-package Session
+package lib
 
 import (
 	"gopkg.in/igm/sockjs-go.v2/sockjs"
 	"log"
 	"github.com/iain17/goTransport/transport/lib/interfaces"
-	"github.com/iain17/goTransport/transport/lib/Message"
-	"github.com/iain17/goTransport/transport/lib/messageType"
 	"sync"
+	"errors"
 )
 
 type session struct {
@@ -45,19 +44,21 @@ func (session *session) IncrementCurrentId() {
 	session.currentId_mutex.Unlock()
 }
 
-func (session *session) Messaged(data string) {
+func (session *session) Messaged(data string) error {
 	log.Printf("Received: %s", data)
-	message := Message.UnSerialize(data)
+	message := UnSerialize(data)
 	if message == nil {
 		log.Print("Invalid message")
-		return
+		return errors.New("Invalid message")
 	}
 	message.Initialize(session)
 
 	err := message.Received()
 	if err != nil {
-		message.Reply(messageType.NewMessageError(err))
+		message.Reply(NewMessageError(err))
+		return err
 	}
+	return nil
 }
 
 func (session *session) Send(message string) {
@@ -66,7 +67,7 @@ func (session *session) Send(message string) {
 }
 
 func (session *session) Call(name string, parameters []interface{}) {
-	message := messageType.NewMessageMethod(name, parameters)
+	message := NewMessageMethod(name, parameters)
 	message.Initialize(session)
-	Message.Send(message)
+	Send(message)
 }

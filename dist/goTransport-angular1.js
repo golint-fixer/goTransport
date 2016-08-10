@@ -219,75 +219,6 @@ var goTransport;
 })(goTransport || (goTransport = {}));
 var goTransport;
 (function (goTransport) {
-    var Session = (function () {
-        function Session(client) {
-            this.currentId = 0;
-            this.messages = [];
-            this.client = client;
-        }
-        Session.prototype.GetCurrentId = function () {
-            return this.currentId;
-        };
-        Session.prototype.GetClient = function () {
-            return this.client;
-        };
-        Session.prototype.SetCurrentId = function (id) {
-            this.currentId = id;
-        };
-        Session.prototype.IncrementCurrentId = function () {
-            this.currentId++;
-        };
-        Session.prototype.connect = function (url) {
-            this.connectedPromise = new goTransport.Promise();
-            if (this.socket == null) {
-                this.socket = Socket.Adapter.getSocket("SockJSClient", url, this);
-            }
-            return this.getConnectedPromise();
-        };
-        Session.prototype.getConnectedPromise = function () {
-            return this.connectedPromise.promise;
-        };
-        Session.prototype.setPreviousMessage = function (message) {
-            console.log('messageManager', 'setPreviousMessage', message.id);
-            this.messages[message.id] = message;
-        };
-        Session.prototype.getPreviousMessage = function (message) {
-            console.log('messageManager', 'getPreviousMessage', message.id, this.messages[message.id]);
-            return this.messages[message.id];
-        };
-        Session.prototype.connected = function () {
-            console.log('connected');
-            this.connectedPromise.resolve();
-        };
-        Session.prototype.Send = function (message) {
-            this.getConnectedPromise().then(function () {
-                this.socket.send(message);
-                console.log('sent', message);
-            }.bind(this));
-        };
-        Session.prototype.messaged = function (data) {
-            console.debug('received', data);
-            var message = goTransport.Message.unSerialize(data);
-            message.Initialize(this);
-            if (!message) {
-                console.warn("Invalid message received.");
-                return;
-            }
-            message.setPreviousMessage(this.getPreviousMessage(message));
-            var error = message.Received();
-            if (error != null) {
-                console.error(error);
-            }
-        };
-        Session.prototype.disconnected = function (code, reason, wasClean) {
-            console.warn('Disconnected', code);
-        };
-        return Session;
-    }());
-    goTransport.Session = Session;
-})(goTransport || (goTransport = {}));
-var goTransport;
-(function (goTransport) {
     var MessageError = (function (_super) {
         __extends(MessageError, _super);
         function MessageError(reason) {
@@ -415,6 +346,75 @@ var goTransport;
     }(goTransport.Message));
     goTransport.MessageMethodResult = MessageMethodResult;
     goTransport.MessageDefinition.set(MessageMethodResult.type, MessageMethodResult);
+})(goTransport || (goTransport = {}));
+var goTransport;
+(function (goTransport) {
+    var Session = (function () {
+        function Session(client) {
+            this.currentId = 0;
+            this.messages = [];
+            this.client = client;
+        }
+        Session.prototype.GetCurrentId = function () {
+            return this.currentId;
+        };
+        Session.prototype.GetClient = function () {
+            return this.client;
+        };
+        Session.prototype.SetCurrentId = function (id) {
+            this.currentId = id;
+        };
+        Session.prototype.IncrementCurrentId = function () {
+            this.currentId++;
+        };
+        Session.prototype.connect = function (url) {
+            this.connectedPromise = new goTransport.Promise();
+            if (this.socket == null) {
+                this.socket = Socket.Adapter.getSocket("SockJSClient", url, this);
+            }
+            return this.getConnectedPromise();
+        };
+        Session.prototype.getConnectedPromise = function () {
+            return this.connectedPromise.promise;
+        };
+        Session.prototype.setPreviousMessage = function (message) {
+            console.log('messageManager', 'setPreviousMessage', message.id);
+            this.messages[message.id] = message;
+        };
+        Session.prototype.getPreviousMessage = function (message) {
+            console.log('messageManager', 'getPreviousMessage', message.id, this.messages[message.id]);
+            return this.messages[message.id];
+        };
+        Session.prototype.connected = function () {
+            console.log('connected');
+            this.connectedPromise.resolve();
+        };
+        Session.prototype.Send = function (message) {
+            this.getConnectedPromise().then(function () {
+                this.socket.send(message);
+                console.log('sent', message);
+            }.bind(this));
+        };
+        Session.prototype.messaged = function (data) {
+            console.debug('received', data);
+            var message = goTransport.Message.unSerialize(data);
+            message.Initialize(this);
+            if (!message) {
+                console.warn("Invalid message received.");
+                return;
+            }
+            message.setPreviousMessage(this.getPreviousMessage(message));
+            var error = message.Received();
+            if (error != null) {
+                console.error(error);
+            }
+        };
+        Session.prototype.disconnected = function (code, reason, wasClean) {
+            console.warn('Disconnected', code);
+        };
+        return Session;
+    }());
+    goTransport.Session = Session;
 })(goTransport || (goTransport = {}));
 var Socket;
 (function (Socket) {

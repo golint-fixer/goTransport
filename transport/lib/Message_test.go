@@ -1,4 +1,4 @@
-package Message
+package lib
 
 import (
 	"testing"
@@ -32,7 +32,7 @@ func TestMessage_SetGetId(t *testing.T) {
 func TestUnSerialize(t *testing.T) {
 	messageType := interfaces.MessageType(12312)
 	exampleMessage := NewMessage(messageType)
-	Set(&exampleMessage)
+	SetMessageDefinition(&exampleMessage)
 
 	data := `12312{"type":0,"id":131,"name":"ping","parameters":["hai"]}`
 	message := UnSerialize(data)

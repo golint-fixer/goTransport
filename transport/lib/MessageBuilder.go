@@ -1,4 +1,4 @@
-package MessageBuilder
+package lib
 
 import (
 	"log"

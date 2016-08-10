@@ -1,4 +1,4 @@
-package Message
+package lib
 
 import (
 	"testing"
@@ -10,9 +10,9 @@ import (
 func TestGet(t *testing.T) {
 	messageType := interfaces.MessageType(1337)
 	exampleMessage := NewMessage(messageType)
-	Set(&exampleMessage)
+	SetMessageDefinition(&exampleMessage)
 
-	resultDefinition := Get(messageType)
+	resultDefinition := GetMessageDefinition(messageType)
 
 	if resultDefinition == nil {
 		t.Fatal("resultDefinition turned out to be an unexpected nil")
@@ -24,7 +24,7 @@ func TestGet(t *testing.T) {
 		t.Fatalf("Expected resultDefinition to be %s, but in return got %s ", reflect.TypeOf(exampleMessage).Name(), resultDefinition.Elem().Name())
 	}
 
-	if Get(interfaces.MessageType(1338)) != nil {
+	if GetMessageDefinition(interfaces.MessageType(1338)) != nil {
 		t.Fatalf("Expected to receive a nil value when requesting a non existing messageType.")
 	}
 }

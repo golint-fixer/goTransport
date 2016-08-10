@@ -14,7 +14,7 @@ type Client interface {
 
 type Session interface {
 	CallableSession
-	Messaged(data string)
+	Messaged(data string) error
 	Send(message string)
 	GetClient() Client
 	GetCurrentId() uint64

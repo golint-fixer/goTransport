@@ -1,4 +1,4 @@
-package Message
+package lib
 
 import (
 	"log"
@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"github.com/iain17/goTransport/transport/lib/interfaces"
 	"encoding/json"
-	"github.com/iain17/goTransport/transport/lib/MessageBuilder"
 )
 
 const headerDelimiter = "\f"
@@ -26,7 +25,7 @@ func NewMessage(message_type interfaces.MessageType) Message {
 		Type: message_type,
 	}
 }
-func validate() interfaces.IMessage {return &Message{}}
+//func validate() interfaces.IMessage {return &Message{}}
 
 func (message *Message) Initialize(session interfaces.Session) {
 	message.session = session
@@ -88,13 +87,13 @@ func UnSerialize(data string) interfaces.IMessage {
 		return nil
 	}
 
-	definition := Get(interfaces.MessageType(message_type))
+	definition := GetMessageDefinition(interfaces.MessageType(message_type))
 	if definition == nil {
 		log.Print("No definition for type: %d", interfaces.MessageType(message_type))
 		return nil
 	}
 
-	return MessageBuilder.Build(definition, parts[1])
+	return Build(definition, parts[1])
 }
 
 //Reply to this message.

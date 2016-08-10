@@ -1,25 +1,24 @@
-package messageType
+package lib
 
 import (
 	"errors"
 	"reflect"
-	"github.com/iain17/goTransport/transport/lib/Message"
 )
 
 type messageMethod struct {
-	Message.Message
+	Message
 	Name       string `json:"name"`
 	Parameters []interface{} `json:"parameters"`
 }
 
 
 func init() {
-	Message.Set(NewMessageMethod("", nil))
+	SetMessageDefinition(NewMessageMethod("", nil))
 }
 
 func NewMessageMethod(name string, parameters []interface{}) *messageMethod {
 	return &messageMethod{
-		Message: Message.NewMessage(Message.MessageTypeMethod),
+		Message: NewMessage(MessageTypeMethod),
 		Name: name,
 		Parameters: parameters,
 	}

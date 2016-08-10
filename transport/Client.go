@@ -4,14 +4,9 @@ import (
 	"gopkg.in/igm/sockjs-go.v2/sockjs"
 	"net/http"
 	"github.com/iain17/goTransport/transport/lib/interfaces"
-	"github.com/iain17/goTransport/transport/lib/messageType"
 	"sync"
-	"github.com/iain17/goTransport/transport/lib/Session"
+	"github.com/iain17/goTransport/transport/lib"
 )
-
-func init() {
-	messageType.Init()
-}
 
 type client struct {
 	HttpHandler http.Handler
@@ -29,7 +24,7 @@ func New(prefix string) interfaces.Client {
 }
 
 func (client *client) Listen(socket sockjs.Session) {
-	session := Session.NewSession(socket, client)
+	session := lib.NewSession(socket, client)
 	for {
 		if msg, err := socket.Recv(); err == nil {
 			go session.Messaged(msg)
