@@ -10,7 +10,7 @@ func testMethod() {
 }
 
 func TestClient_Method(t *testing.T) {
-	client := New("")
+	client := New("", nil)
 	client.Method("A test", testMethod)
 	method := client.GetMethod("A test")
 	if reflect.TypeOf(method) != reflect.TypeOf(testMethod) {

@@ -116,7 +116,7 @@ func TestSession_Call(t *testing.T) {
 	session := NewSession(socket, client)
 
 	SendCalled = false
-	session.Call("example", nil)
+	session.Call("example", nil, 0)
 	if SendCalled != true {
 		t.Fatal("Call should've sent a message requesting the method call.")
 	}
