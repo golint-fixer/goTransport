@@ -2,7 +2,7 @@
 [![GoDoc](https://godoc.org/github.com/iain17/goTransport?status.svg)](https://godoc.org/github.com/iain17/goTransport)
 [![Build Status: Linux](https://travis-ci.org/iain17/goTransport.svg?branch=master)](https://travis-ci.org/iain17/goTransport)
 [![Coverage Status](https://codecov.io/gh/iain17/goTransport/branch/master/graph/badge.svg)](https://codecov.io/gh/iain17/goTransport)
-[![Go Report Card](https://goreportcard.com/badge/github.com/iain17/goTransport)](https://goreportcard.com/report/github.com/iain17/goTransport)
+[![Go Report Card](https://goreportcard.com/badge/github.com/iain17/goTransport?v=1)](https://goreportcard.com/report/github.com/iain17/goTransport)
 [![Gitter](https://badges.gitter.im/join_chat.svg)](https://gitter.im/iain17/goTransport)
 
 [GoTransport](https://github.com/iain17/goTransport) GoLang-SockJS-Angular 1, RPC++ socket.
