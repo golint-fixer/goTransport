@@ -1,6 +1,7 @@
 package interfaces
 
 import (
+	"github.com/fanliao/go-promise"
 	"gopkg.in/igm/sockjs-go.v2/sockjs"
 	"net/http"
 )
@@ -25,5 +26,5 @@ type ISession interface {
 }
 
 type ICallableSession interface {
-	Call(name string, parameters []interface{})
+	Call(name string, parameters []interface{}) *promise.Promise
 }

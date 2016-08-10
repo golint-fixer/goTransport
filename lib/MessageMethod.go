@@ -2,6 +2,7 @@ package lib
 
 import (
 	"errors"
+	"github.com/fanliao/go-promise"
 	"github.com/iain17/goTransport/lib/interfaces"
 	"reflect"
 )
@@ -10,6 +11,7 @@ type messageMethod struct {
 	Message
 	Name       string        `json:"name"`
 	Parameters []interface{} `json:"parameters"`
+	promise    *promise.Promise
 }
 
 func init() {
@@ -25,7 +27,12 @@ func newMessageMethod(name string, parameters []interface{}) *messageMethod {
 }
 
 func (message *messageMethod) Sending() error {
+	message.promise = promise.NewPromise()
 	return nil
+}
+
+func (message *messageMethod) GetPromise() *promise.Promise {
+	return message.promise
 }
 
 //Received a request to call a method on our side. Figure out which method it is, and dynamically call it with the sent along parameters.

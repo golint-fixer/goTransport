@@ -1,8 +1,8 @@
 package lib
 
 import (
+	"errors"
 	"github.com/iain17/goTransport/lib/interfaces"
-	"log"
 )
 
 type messageMethodResult struct {
@@ -28,7 +28,15 @@ func (message messageMethodResult) Sending() error {
 }
 
 func (message messageMethodResult) Received(previousMessage interfaces.IMessage) error {
-	log.Print(previousMessage)
-	log.Print(message.Parameters)
-	return nil
+	if previousMessageMethod, ok := previousMessage.(*messageMethod); ok {
+		promise := previousMessageMethod.GetPromise()
+		if message.Result {
+			promise.Resolve(message.Parameters[0])
+		} else {
+			promise.Reject(errors.New("Result false"))
+		}
+		return nil
+	} else {
+		return errors.New("Invalid or no previousMessage")
+	}
 }

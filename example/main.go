@@ -23,9 +23,14 @@ func ping(session interfaces.ICallableSession, message string) (string, error) {
 	log.Print("called with parameter: ", message)
 
 	log.Print("Calling example method client side.")
-	session.Call("example", []interface{}{
+	promise := session.Call("example", []interface{}{
 		"A test",
 		1337,
+	})
+	promise.OnSuccess(func(v interface{}) {
+		log.Print("Success: ", v)
+	}).OnFailure(func(v interface{}) {
+		log.Print("Failure: ", v)
 	})
 
 	log.Print("Returning a previousMessage")

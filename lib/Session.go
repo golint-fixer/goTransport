@@ -2,6 +2,7 @@ package lib
 
 import (
 	"errors"
+	"github.com/fanliao/go-promise"
 	"github.com/iain17/goTransport/lib/interfaces"
 	"gopkg.in/igm/sockjs-go.v2/sockjs"
 	"log"
@@ -87,8 +88,9 @@ func (session *session) Send(message string) {
 	log.Print("Sending to client:", message)
 }
 
-func (session *session) Call(name string, parameters []interface{}) {
+func (session *session) Call(name string, parameters []interface{}) *promise.Promise {
 	message := newMessageMethod(name, parameters)
 	message.Initialize(session)
 	Send(message)
+	return message.GetPromise()
 }
