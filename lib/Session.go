@@ -13,7 +13,8 @@ type session struct {
 	client         interfaces.IClient
 	currentId      uint64
 	currentIDMutex *sync.Mutex
-	messages       []interfaces.IMessage
+	messages       map[uint64]interfaces.IMessage
+	messagesMutex  *sync.Mutex
 }
 
 //Creates a new session.
@@ -23,6 +24,8 @@ func NewSession(socket sockjs.Session, client interfaces.IClient) interfaces.ISe
 		client:         client,
 		currentId:      0,
 		currentIDMutex: new(sync.Mutex),
+		messages:       make(map[uint64]interfaces.IMessage),
+		messagesMutex:  new(sync.Mutex),
 	}
 
 }
@@ -66,11 +69,17 @@ func (session *session) Messaged(data string) error {
 }
 
 func (session *session) SetPreviousMessage(message interfaces.IMessage) {
+	session.messagesMutex.Lock()
 	session.messages[message.GetId()] = message
+	session.messagesMutex.Unlock()
 }
 
 func (session *session) GetPreviousMessage(message interfaces.IMessage) interfaces.IMessage {
-	return session.messages[message.GetId()]
+	previousMessage := session.messages[message.GetId()]
+	if previousMessage == nil {
+		return nil
+	}
+	return previousMessage
 }
 
 func (session *session) Send(message string) {
