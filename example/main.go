@@ -10,7 +10,7 @@ import (
 
 func main() {
 	http.Handle("/", http.FileServer(http.Dir("../goTransport-client/")))
-	transporter := goTransport.New("/ws")
+	transporter := goTransport.New("/ws", connected)
 	transporter.Method("ping", ping)
 
 	log.Print("goTransport server spawning at port: 8081")
@@ -19,8 +19,8 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
 
-func ping(session interfaces.ICallableSession, message string) (string, error) {
-	log.Print("called with parameter: ", message)
+func connected(session interfaces.ICallableSession) {
+	log.Printf("New client connected: %s", session.GetId())
 
 	log.Print("Calling example method client side.")
 	promise := session.Call("example", []interface{}{
@@ -32,6 +32,9 @@ func ping(session interfaces.ICallableSession, message string) (string, error) {
 	}).OnFailure(func(v interface{}) {
 		log.Print("Failure: ", v)
 	})
+}
 
+func ping(session interfaces.ICallableSession, message string) (string, error) {
+	log.Print("called with parameter: ", message)
 	return "bar", errors.New("test")
 }

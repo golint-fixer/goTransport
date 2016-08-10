@@ -99,3 +99,11 @@ func (session *session) Call(name string, parameters []interface{}, timeout uint
 	promise.SetTimeout(int(timeout))
 	return promise
 }
+
+func (session *session) Close(status uint32, reason string) {
+	session.socket.Close(status, reason)
+}
+
+func (session *session) GetId() string {
+	return session.socket.ID()
+}
