@@ -7,10 +7,9 @@ import (
 
 type messageMethod struct {
 	Message
-	Name       string `json:"name"`
+	Name       string        `json:"name"`
 	Parameters []interface{} `json:"parameters"`
 }
-
 
 func init() {
 	SetMessageDefinition(NewMessageMethod("", nil))
@@ -18,8 +17,8 @@ func init() {
 
 func NewMessageMethod(name string, parameters []interface{}) *messageMethod {
 	return &messageMethod{
-		Message: NewMessage(MessageTypeMethod),
-		Name: name,
+		Message:    NewMessage(MessageTypeMethod),
+		Name:       name,
 		Parameters: parameters,
 	}
 }
@@ -32,8 +31,8 @@ func (message *messageMethod) Sending() error {
 func (message *messageMethod) Received() error {
 	//Catch any panics
 	defer func() {
-		// recover from panic if one occured. Set err to nil otherwise.
-		if (recover() != nil) {
+		// recover from panic if one occurred. Set err to nil otherwise.
+		if recover() != nil {
 			message.Reply(NewMessageError(errors.New("Panic whilst running method")))
 		}
 	}()
@@ -43,8 +42,8 @@ func (message *messageMethod) Received() error {
 
 	//Get the requested method
 	method := message.GetSession().GetClient().GetMethod(message.Name)
-	if method == nil  {
-		return errors.New("[404]: Unknown method:"+message.Name)
+	if method == nil {
+		return errors.New("[404]: Unknown method:" + message.Name)
 	}
 	rpcMethod := reflect.ValueOf(method)
 
@@ -67,5 +66,5 @@ func (message *messageMethod) Received() error {
 
 	//Reply with the returned result by the called method
 	message.Reply(NewMessageMethodResult(true, result))
-	return 	nil
+	return nil
 }

@@ -1,21 +1,21 @@
 package lib
 
 import (
-	"log"
-	"strings"
-	"strconv"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"encoding/json"
 	"github.com/iain17/goTransport/lib/interfaces"
+	"log"
+	"strconv"
+	"strings"
 )
 
 const headerDelimiter = "\f"
 
 type Message struct {
-	Id uint64 `json:"id"`
-	Type interfaces.MessageType `json:"type"`
-	session interfaces.Session `json:"-"`
+	Id      uint64                 `json:"id"`
+	Type    interfaces.MessageType `json:"type"`
+	session interfaces.Session     `json:"-"`
 }
 
 //Constructor
@@ -25,6 +25,7 @@ func NewMessage(message_type interfaces.MessageType) Message {
 		Type: message_type,
 	}
 }
+
 //func validate() interfaces.IMessage {return &Message{}}
 
 func (message *Message) Initialize(session interfaces.Session) {
@@ -98,7 +99,7 @@ func UnSerialize(data string) interfaces.IMessage {
 
 //Reply to this message.
 func (message *Message) Reply(replyMessage interfaces.IMessage) {
-	if(message.GetSession() == nil) {
+	if message.GetSession() == nil {
 		log.Print("MessageType %d has not been initialized.", message.GetType())
 		return
 	}
@@ -109,7 +110,7 @@ func (message *Message) Reply(replyMessage interfaces.IMessage) {
 
 //Sends the message to the client.
 func Send(message interfaces.IMessage) {
-	if(message.GetSession() == nil) {
+	if message.GetSession() == nil {
 		log.Print("MessageType %d has not been initialized.", message.GetType())
 		return
 	}

@@ -1,10 +1,10 @@
 package lib
 
 import (
-	"testing"
-	"reflect"
 	"github.com/iain17/goTransport/lib/interfaces"
 	"log"
+	"reflect"
+	"testing"
 )
 
 func TestGet(t *testing.T) {

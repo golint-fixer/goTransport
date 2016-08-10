@@ -29,5 +29,5 @@ func (message messageError) Sending() error {
 
 func (message messageError) Received() error {
 	log.Print(message.Reason)
-	return 	nil
+	return nil
 }

@@ -1,9 +1,9 @@
 package lib
 
 import (
-	"sync"
-	"reflect"
 	"github.com/iain17/goTransport/lib/interfaces"
+	"reflect"
+	"sync"
 )
 
 const (

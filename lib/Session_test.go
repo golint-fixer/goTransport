@@ -1,15 +1,14 @@
 package lib
 
 import (
-	"testing"
-	"net/http"
 	"github.com/iain17/goTransport/lib/interfaces"
 	"gopkg.in/igm/sockjs-go.v2/sockjs"
+	"net/http"
+	"testing"
 )
 
 //FakeClient
 type fakeClient struct {
-
 }
 
 func (client *fakeClient) Listen(socket sockjs.Session) {
@@ -57,8 +56,8 @@ func TestSession_CurrentId(t *testing.T) {
 
 //FakeSocket
 var SendCalled bool
-type fakeSocket struct {
 
+type fakeSocket struct {
 }
 
 func (client *fakeSocket) ID() string {
@@ -84,7 +83,7 @@ func TestSession_Messaged(t *testing.T) {
 	session := NewSession(socket, client)
 
 	SendCalled = false
-	err := session.Messaged(`1`+headerDelimiter+`{"id":1,"type":1,"name":"ping","parameters":["hai"]}`)
+	err := session.Messaged(`1` + headerDelimiter + `{"id":1,"type":1,"name":"ping","parameters":["hai"]}`)
 	if err != nil {
 		t.Fatal("Messaged should have accepted this message")
 	}
@@ -93,7 +92,7 @@ func TestSession_Messaged(t *testing.T) {
 	}
 
 	SendCalled = false
-	err = session.Messaged(`1`+headerDelimiter+`{"id":1,"type":9090909090}`)
+	err = session.Messaged(`1` + headerDelimiter + `{"id":1,"type":9090909090}`)
 	if err == nil {
 		t.Fatal("Messaged should have stopped this message")
 	}

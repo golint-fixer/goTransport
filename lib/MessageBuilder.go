@@ -1,10 +1,10 @@
 package lib
 
 import (
-	"log"
-	"reflect"
 	"encoding/json"
 	"github.com/iain17/goTransport/lib/interfaces"
+	"log"
+	"reflect"
 )
 
 func Build(definition reflect.Type, data string) interfaces.IMessage {
@@ -18,6 +18,7 @@ func Build(definition reflect.Type, data string) interfaces.IMessage {
 	if message, ok := __message.Addr().Interface().(interfaces.IMessage); ok {
 		return message
 	}
+
 	log.Print("Could not cast message to IMessage interface. Invalid MessageType")
 	return nil
 }

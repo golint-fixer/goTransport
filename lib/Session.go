@@ -1,25 +1,25 @@
 package lib
 
 import (
+	"errors"
+	"github.com/iain17/goTransport/lib/interfaces"
 	"gopkg.in/igm/sockjs-go.v2/sockjs"
 	"log"
-	"github.com/iain17/goTransport/lib/interfaces"
 	"sync"
-	"errors"
 )
 
 type session struct {
-	socket sockjs.Session
-	client interfaces.Client
-	currentId uint64
+	socket          sockjs.Session
+	client          interfaces.Client
+	currentId       uint64
 	currentId_mutex *sync.Mutex
 }
 
 func NewSession(socket sockjs.Session, client interfaces.Client) interfaces.Session {
 	return &session{
-		socket: socket,
-		client: client,
-		currentId: 0,
+		socket:          socket,
+		client:          client,
+		currentId:       0,
 		currentId_mutex: new(sync.Mutex),
 	}
 }
