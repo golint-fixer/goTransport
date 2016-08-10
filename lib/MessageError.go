@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"github.com/iain17/goTransport/lib/interfaces"
 	"log"
 )
 
@@ -27,7 +28,7 @@ func (message messageError) Sending() error {
 	return nil
 }
 
-func (message messageError) Received() error {
+func (message messageError) Received(previousMessage interfaces.IMessage) error {
 	log.Print(message.Reason)
 	return nil
 }

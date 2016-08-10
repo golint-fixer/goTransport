@@ -59,7 +59,7 @@ func (message *Message) Sending() error {
 }
 
 //Received the message.
-func (message *Message) Received() error {
+func (message *Message) Received(previousMessage interfaces.IMessage) error {
 	return errors.New(fmt.Sprintf("MessageType %d has not implemented Received()", message.Type))
 }
 
@@ -105,6 +105,8 @@ func (message *Message) Reply(replyMessage interfaces.IMessage) {
 	}
 
 	replyMessage.SetId(message.GetId())
+	replyMessage.Sending()
+	message.session.SetPreviousMessage(message)
 	message.session.Send(serialize(replyMessage))
 }
 
@@ -119,5 +121,6 @@ func Send(message interfaces.IMessage) {
 	session.IncrementCurrentId()
 	message.SetId(session.GetCurrentId())
 	message.Sending()
+	session.SetPreviousMessage(message)
 	session.Send(serialize(message))
 }

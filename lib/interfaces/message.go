@@ -13,7 +13,7 @@ type IMessage interface {
 	GetType() MessageType
 	//setReply()
 	Sending() error
-	Received() error
+	Received(previousMessage IMessage) error
 	Reply(replyMessage IMessage)
 	//Send()
 	//serialize() string

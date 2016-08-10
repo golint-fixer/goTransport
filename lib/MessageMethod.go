@@ -2,6 +2,7 @@ package lib
 
 import (
 	"errors"
+	"github.com/iain17/goTransport/lib/interfaces"
 	"reflect"
 )
 
@@ -28,7 +29,7 @@ func (message *messageMethod) Sending() error {
 }
 
 //Received a request to call a method on our side. Figure out which method it is, and dynamically call it with the sent along parameters.
-func (message *messageMethod) Received() error {
+func (message *messageMethod) Received(previousMessage interfaces.IMessage) error {
 	//Catch any panics
 	defer func() {
 		// recover from panic if one occurred. Set err to nil otherwise.

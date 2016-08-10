@@ -20,6 +20,8 @@ type ISession interface {
 	GetCurrentId() uint64
 	SetCurrentId(id uint64)
 	IncrementCurrentId()
+	SetPreviousMessage(message IMessage)
+	GetPreviousMessage(message IMessage) IMessage
 }
 
 type ICallableSession interface {

@@ -13,6 +13,7 @@ type session struct {
 	client         interfaces.IClient
 	currentId      uint64
 	currentIDMutex *sync.Mutex
+	messages       []interfaces.IMessage
 }
 
 //Creates a new session.
@@ -50,17 +51,26 @@ func (session *session) Messaged(data string) error {
 	log.Printf("Received: %s", data)
 	message := UnSerialize(data)
 	if message == nil {
-		log.Print("Invalid message")
-		return errors.New("Invalid message")
+		log.Print("Invalid message received.")
+		return errors.New("Invalid message received.")
 	}
 	message.Initialize(session)
 
-	err := message.Received()
+	//Set the previous message that was sent for this message id.
+	err := message.Received(session.GetPreviousMessage(message))
 	if err != nil {
 		message.Reply(newMessageError(err))
 		return err
 	}
 	return nil
+}
+
+func (session *session) SetPreviousMessage(message interfaces.IMessage) {
+	session.messages[message.GetId()] = message
+}
+
+func (session *session) GetPreviousMessage(message interfaces.IMessage) interfaces.IMessage {
+	return session.messages[message.GetId()]
 }
 
 func (session *session) Send(message string) {

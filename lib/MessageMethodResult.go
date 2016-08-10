@@ -1,5 +1,7 @@
 package lib
 
+import "github.com/iain17/goTransport/lib/interfaces"
+
 type messageMethodResult struct {
 	Message
 	Result     bool          `json:"result"`
@@ -22,6 +24,6 @@ func (message messageMethodResult) Sending() error {
 	return nil
 }
 
-func (message messageMethodResult) Received() error {
+func (message messageMethodResult) Received(previousMessage interfaces.IMessage) error {
 	return nil
 }
