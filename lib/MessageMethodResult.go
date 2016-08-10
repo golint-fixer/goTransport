@@ -1,6 +1,9 @@
 package lib
 
-import "github.com/iain17/goTransport/lib/interfaces"
+import (
+	"github.com/iain17/goTransport/lib/interfaces"
+	"log"
+)
 
 type messageMethodResult struct {
 	Message
@@ -25,5 +28,7 @@ func (message messageMethodResult) Sending() error {
 }
 
 func (message messageMethodResult) Received(previousMessage interfaces.IMessage) error {
+	log.Print(previousMessage)
+	log.Print(message.Parameters)
 	return nil
 }
