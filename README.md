@@ -1,7 +1,6 @@
 # GoTransport
 [![GoDoc](https://godoc.org/github.com/iain17/goTransport?status.svg)](https://godoc.org/github.com/iain17/goTransport)
 [![Build Status: Linux](https://travis-ci.org/iain17/goTransport.svg?branch=master)](https://travis-ci.org/iain17/goTransport)
-[![Build Status: Windows](https://ci.appveyor.com/api/projects/status/vcvontw1aus6ixln/branch/master?svg=true)](https://ci.appveyor.com/project/zg/service/branch/master)
 [![Coverage Status](https://codecov.io/gh/iain17/goTransport/branch/master/graph/badge.svg)](https://codecov.io/gh/iain17/goTransport)
 [![Go Report Card](https://goreportcard.com/badge/github.com/iain17/goTransport)](https://goreportcard.com/report/github.com/iain17/goTransport)
 [![Gitter](https://badges.gitter.im/join_chat.svg)](https://gitter.im/iain17/goTransport)
@@ -19,18 +18,18 @@ You must have Bower and GoLang installed before you can continue.
 - Basic knowledge of both Angular and GoLang.
 
 ###Install
-1. `bower install goTransport-angular1`
+1. `bower install goTransport-client`
 2. Made sure the [SockJS client library](https://github.com/sockjs/sockjs-client) is loaded. (It should automatically get loaded in as a bower dependency)
 3. Add `goTransport` as a module dependency to your app.
-4. Open your Go application and `import "github.com/iain17/goTransport/transport"`
+4. Open your Go application and `import "github.com/iain17/goTransport"`
 
 ###How to get the example running
-1. `go get github.com/iain17/goTransport/transport`
-2. `cd "$GOPATH/src/github.com/iain17/goTransport"`
+1. `go get github.com/iain17/goTransport`
+2. `cd "$GOPATH/src/github.com/iain17/goTransport/goTransport-client"`
 2. `bower install`
-3. `cd transport/example`
+3. `cd ../example`
 4. `go run main.go`
-5. Open a browser and navigate to localhost:8081/angular1/example.
+5. Open a browser and navigate to localhost:8081/src/example/.
 This should fetch all the dependencies using bower and run a basic go http server serving the static files and GoTransport socket instance for the example.
 
 ## Usage
