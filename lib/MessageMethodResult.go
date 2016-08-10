@@ -2,7 +2,7 @@ package lib
 
 type messageMethodResult struct {
 	Message
-	Result       bool `json:"result"`
+	Result     bool          `json:"result"`
 	Parameters []interface{} `json:"parameters"`
 }
 
@@ -12,8 +12,8 @@ func init() {
 
 func NewMessageMethodResult(result bool, parameters []interface{}) *messageMethodResult {
 	return &messageMethodResult{
-		Message: NewMessage(MessageTypeMethodResult),
-		Result: result,
+		Message:    NewMessage(MessageTypeMethodResult),
+		Result:     result,
 		Parameters: parameters,
 	}
 }
@@ -23,5 +23,5 @@ func (message messageMethodResult) Sending() error {
 }
 
 func (message messageMethodResult) Received() error {
-	return 	nil
+	return nil
 }

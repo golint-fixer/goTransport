@@ -1,8 +1,8 @@
 package interfaces
 
 import (
-	"net/http"
 	"gopkg.in/igm/sockjs-go.v2/sockjs"
+	"net/http"
 )
 
 type Client interface {

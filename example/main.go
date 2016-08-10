@@ -1,11 +1,11 @@
 package main
 
 import (
-	"net/http"
-	"log"
 	"errors"
-	"github.com/iain17/goTransport/lib/interfaces"
 	"github.com/iain17/goTransport"
+	"github.com/iain17/goTransport/lib/interfaces"
+	"log"
+	"net/http"
 )
 
 func main() {
@@ -18,7 +18,6 @@ func main() {
 	http.Handle("/ws/", transporter.GetHttpHandler())
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
-
 
 func ping(session interfaces.CallableSession, message string) (string, error) {
 	log.Print("called with parameter: ", message)

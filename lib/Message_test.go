@@ -1,8 +1,8 @@
 package lib
 
 import (
-	"testing"
 	"github.com/iain17/goTransport/lib/interfaces"
+	"testing"
 )
 
 type messageTest struct {
@@ -13,7 +13,7 @@ type messageTest struct {
 func NewMessageTest(foo string) *messageTest {
 	return &messageTest{
 		Message: NewMessage(MessageTypeTest),
-		Foo: foo,
+		Foo:     foo,
 	}
 }
 
@@ -45,8 +45,6 @@ func TestUnSerialize(t *testing.T) {
 		t.Fatalf("UnSerialize failed. Id expected to be 131 but received: %d", message.GetId())
 	}
 }
-
-
 
 //func TestMessage_Send(t *testing.T) {
 //	message := NewMessageTest("test")

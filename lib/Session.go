@@ -22,6 +22,7 @@ func NewSession(socket sockjs.Session, client interfaces.Client) interfaces.Sess
 		currentId:       0,
 		currentId_mutex: new(sync.Mutex),
 	}
+
 }
 
 func (session *session) GetClient() interfaces.Client {

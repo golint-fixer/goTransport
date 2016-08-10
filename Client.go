@@ -1,23 +1,23 @@
 package goTransport
 
 import (
+	"github.com/iain17/goTransport/lib"
+	"github.com/iain17/goTransport/lib/interfaces"
 	"gopkg.in/igm/sockjs-go.v2/sockjs"
 	"net/http"
 	"sync"
-	"github.com/iain17/goTransport/lib/interfaces"
-	"github.com/iain17/goTransport/lib"
 )
 
 type client struct {
-	HttpHandler http.Handler
+	HttpHandler   http.Handler
 	methods_mutex *sync.Mutex
-	methods map[string]interfaces.CallableMethod
+	methods       map[string]interfaces.CallableMethod
 }
 
 func New(prefix string) interfaces.Client {
 	client := &client{
 		methods_mutex: new(sync.Mutex),
-		methods: make(map[string]interfaces.CallableMethod),
+		methods:       make(map[string]interfaces.CallableMethod),
 	}
 	client.HttpHandler = sockjs.NewHandler(prefix, sockjs.DefaultOptions, client.Listen)
 	return client
@@ -35,7 +35,7 @@ func (client *client) Listen(socket sockjs.Session) {
 }
 
 func (client *client) GetHttpHandler() http.Handler {
-	return client.HttpHandler;
+	return client.HttpHandler
 }
 
 func (client *client) Method(name string, method interfaces.CallableMethod) {
