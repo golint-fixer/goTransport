@@ -4,14 +4,17 @@
 [![Coverage Status](https://codecov.io/gh/iain17/goTransport/branch/master/graph/badge.svg)](https://codecov.io/gh/iain17/goTransport)
 [![Go Report Card](https://goreportcard.com/badge/github.com/iain17/goTransport?v=1)](https://goreportcard.com/report/github.com/iain17/goTransport)
 [![Gitter](https://badges.gitter.im/join_chat.svg)](https://gitter.im/iain17/goTransport)
+After years of working with MeteorJS in combination with Angular, I wanted to recreate and improve to some extent some of that magic but using Go as a backend.
 
-[GoTransport](https://github.com/iain17/goTransport) GoLang-SockJS-Angular 1, RPC++ socket.
-A RPC SockJS GoLang library. Starting with an Angular 1 client this library tries to fulfill the dire need I have for a proper javascript to Go RPC socket connection.
-Eventually it should also pub and sub on events and sync collections of data.
+This project is designed to do the following:
+- Easy Remote Procedure Calls (RPC) on both server (GoLang) and client (Angular)
+- Sync collections of data.
+
+This repository is a work in progress. Anything is Master is considered Stable. Its not recommended to use this yet in release.
 
 Building on top off the work of: [Igor Mihalik's sockjs-go](https://github.com/igm/sockjs-go).
 
-##GoTransport - Angular 1 module
+## Omissions
 You must have Bower and GoLang installed before you can continue.
 - [Documentation about installing bower](https://bower.io/#install-bower)
 - [Documentation about installing GoLang](https://golang.org/doc/install)
@@ -44,39 +47,75 @@ angular.module('goTransport-example', ['goTransport'])
 			console.log('Connected!');
 		});
 
+		//Bidirectional method calling. With dynamic parameters
+
+		//Server calling the client and sending back a optional response.
+		goTransport.method('example', function(message, number) {
+			console.log(message, number);
+			return "Hello there server :-)";
+		});
+
+		//Client calling the server and getting a response.
 		$scope.pong = '';
 		$scope.ping = function() {
-			goTransport.method('ping', ['hai']).then(function(message, err) {
-			    if(err) {
-			        console.error(err);
-			        return;
-			    }
-			    console.log(result);
-            });
-        };
-    });
+			goTransport.call('ping', ['hai']).then(function(result, err) {
+				if(err) {
+					console.error(err);
+					return;
+				}
+				console.log(result);
+				$scope.pong = result;
+			}, function(err) {
+				console.error(err);
+			});
+		};
+
+	});
 ```
 **Example Server:**
 ```go
 package main
 
 import (
-	"net/http"
+	"errors"
+	"github.com/iain17/goTransport"
+	"github.com/iain17/goTransport/lib/interfaces"
 	"log"
-	"github.com/iain17/goTransport/transport"
+	"net/http"
 )
 
 func main() {
-	transporter := transport.NewTransport("/ws")
-	transporter.SetRPCMethod("ping", ping)
-	http.Handle("/ws/", transporter.HttpHandler)
+	http.Handle("/", http.FileServer(http.Dir("../goTransport-client/")))
+	transporter := goTransport.New("/ws", connected)
+	transporter.Method("ping", ping)
+
+	log.Print("goTransport server spawning at port: 8081")
+	log.Print("Angular 1 example available at: localhost:8081/src/example/")
+	http.Handle("/ws/", transporter.GetHttpHandler())
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
-//Free parameters and return values. No array of interfaces.
-func ping(message string) (string, error) {
-	log.Print("called", message)
-	return "bar", nil
+
+func connected(session interfaces.ICallableSession) {
+	log.Printf("New client connected: %s", session.GetId())
+
+	log.Print("Calling example method client side.")
+	promise := session.Call("example", []interface{}{
+		"A test",
+		1337,
+	}, 0)
+	promise.OnSuccess(func(v interface{}) {
+		log.Print("Success: ", v)
+	}).OnFailure(func(v interface{}) {
+		log.Print("Failure: ", v)
+	})
 }
+
+//Free parameters and return values. No array of interfaces.
+func ping(session interfaces.ICallableSession, message string) (string, error) {
+	log.Print("called with parameter: ", message)
+	return "bar", errors.New("test")
+}
+
 ```
 
 ### Publish–subscribe.
