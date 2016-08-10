@@ -1,5 +1,11 @@
-[![Coverage Status](https://coveralls.io/repos/github/iain17/goTransport/badge.svg?branch=master)](https://coveralls.io/github/iain17/goTransport?branch=master)
 # GoTransport
+[![GoDoc](https://godoc.org/github.com/iain17/goTransport?status.svg)](https://godoc.org/github.com/iain17/goTransport)
+[![Build Status: Linux](https://travis-ci.org/iain17/goTransport.svg?branch=master)](https://travis-ci.org/iain17/goTransport)
+[![Build Status: Windows](https://ci.appveyor.com/api/projects/status/vcvontw1aus6ixln/branch/master?svg=true)](https://ci.appveyor.com/project/zg/service/branch/master)
+[![Coverage Status](https://codecov.io/gh/iain17/goTransport/branch/master/graph/badge.svg)](https://codecov.io/gh/iain17/goTransport)
+[![Go Report Card](https://goreportcard.com/badge/github.com/iain17/goTransport)](https://goreportcard.com/report/github.com/iain17/goTransport)
+[![Gitter](https://badges.gitter.im/join_chat.svg)](https://gitter.im/iain17/goTransport)
+
 [GoTransport](https://github.com/iain17/goTransport) GoLang-SockJS-Angular 1, RPC++ socket.
 A RPC SockJS GoLang library. Starting with an Angular 1 client this library tries to fulfill the dire need I have for a proper javascript to Go RPC socket connection.
 Eventually it should also pub and sub on events and sync collections of data.
