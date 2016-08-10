@@ -52,7 +52,7 @@ func (session *session) IncrementCurrentId() {
 }
 
 func (session *session) Messaged(data string) error {
-	log.Printf("Received: %s", data)
+	//log.Printf("Received: %s", data)
 	message := UnSerialize(data)
 	if message == nil {
 		log.Print("Invalid message received.")
@@ -85,12 +85,17 @@ func (session *session) GetPreviousMessage(message interfaces.IMessage) interfac
 
 func (session *session) Send(message string) {
 	session.socket.Send(message)
-	log.Print("Sending to client:", message)
+	//log.Print("Sending to client:", message)
 }
 
-func (session *session) Call(name string, parameters []interface{}) *promise.Promise {
+func (session *session) Call(name string, parameters []interface{}, timeout uint) *promise.Promise {
+	if timeout == 0 {
+		timeout = 3000
+	}
 	message := newMessageMethod(name, parameters)
 	message.Initialize(session)
 	Send(message)
-	return message.GetPromise()
+	promise := message.GetPromise()
+	promise.SetTimeout(int(timeout))
+	return promise
 }

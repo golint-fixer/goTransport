@@ -26,5 +26,5 @@ type ISession interface {
 }
 
 type ICallableSession interface {
-	Call(name string, parameters []interface{}) *promise.Promise
+	Call(name string, parameters []interface{}, timeout uint) *promise.Promise
 }
