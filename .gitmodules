@@ -1,0 +1,3 @@
+[submodule "goTransport-client"]
+	path = goTransport-client
+	url = https://github.com/iain17/goTransport-client.git

@@ -1,4 +1,4 @@
-![alt tag](http://www.evanmiller.org/images/go-gopher3.png)
+[![Coverage Status](https://coveralls.io/repos/github/iain17/goTransport/badge.svg?branch=master)](https://coveralls.io/github/iain17/goTransport?branch=master)
 # GoTransport
 [GoTransport](https://github.com/iain17/goTransport) GoLang-SockJS-Angular 1, RPC++ socket.
 A RPC SockJS GoLang library. Starting with an Angular 1 client this library tries to fulfill the dire need I have for a proper javascript to Go RPC socket connection.

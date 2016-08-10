@@ -9,12 +9,12 @@ import (
 )
 
 func main() {
-	http.Handle("/", http.FileServer(http.Dir("../client/")))
+	http.Handle("/", http.FileServer(http.Dir("../goTransport-client/")))
 	transporter := goTransport.New("/ws")
 	transporter.Method("ping", ping)
 
 	log.Print("goTransport server spawning at port: 8081")
-	log.Print("Angular 1 example available at: localhost:8081/angular1/example/")
+	log.Print("Angular 1 example available at: localhost:8081/src/example/")
 	http.Handle("/ws/", transporter.GetHttpHandler())
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
