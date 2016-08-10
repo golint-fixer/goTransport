@@ -7,10 +7,10 @@ type messageMethodResult struct {
 }
 
 func init() {
-	SetMessageDefinition(NewMessageMethodResult(false, nil))
+	SetMessageDefinition(newMessageMethodResult(false, nil))
 }
 
-func NewMessageMethodResult(result bool, parameters []interface{}) *messageMethodResult {
+func newMessageMethodResult(result bool, parameters []interface{}) *messageMethodResult {
 	return &messageMethodResult{
 		Message:    NewMessage(MessageTypeMethodResult),
 		Result:     result,

@@ -14,7 +14,7 @@ type client struct {
 	methods       map[string]interfaces.CallableMethod
 }
 
-func New(prefix string) interfaces.Client {
+func New(prefix string) interfaces.IClient {
 	client := &client{
 		methods_mutex: new(sync.Mutex),
 		methods:       make(map[string]interfaces.CallableMethod),

@@ -5,23 +5,23 @@ import (
 	"net/http"
 )
 
-type Client interface {
+type IClient interface {
 	GetHttpHandler() http.Handler
 	Listen(socket sockjs.Session)
 	Method(name string, method CallableMethod)
 	GetMethod(name string) CallableMethod
 }
 
-type Session interface {
-	CallableSession
+type ISession interface {
+	ICallableSession
 	Messaged(data string) error
 	Send(message string)
-	GetClient() Client
+	GetClient() IClient
 	GetCurrentId() uint64
 	SetCurrentId(id uint64)
 	IncrementCurrentId()
 }
 
-type CallableSession interface {
+type ICallableSession interface {
 	Call(name string, parameters []interface{})
 }

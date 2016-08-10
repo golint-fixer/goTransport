@@ -23,7 +23,7 @@ func (client *fakeClient) Method(name string, method interfaces.CallableMethod) 
 
 }
 
-func ping(session interfaces.CallableSession, message string) {
+func ping(session interfaces.ICallableSession, message string) {
 
 }
 

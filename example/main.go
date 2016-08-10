@@ -19,7 +19,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
 
-func ping(session interfaces.CallableSession, message string) (string, error) {
+func ping(session interfaces.ICallableSession, message string) (string, error) {
 	log.Print("called with parameter: ", message)
 
 	log.Print("Calling example method client side.")

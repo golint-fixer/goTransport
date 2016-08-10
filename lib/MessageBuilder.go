@@ -7,15 +7,14 @@ import (
 	"reflect"
 )
 
-func Build(definition reflect.Type, data string) interfaces.IMessage {
-	_message := reflect.New(definition).Interface()
-	err := json.Unmarshal([]byte(data), &_message)
+func build(definition reflect.Type, jsonData string) interfaces.IMessage {
+	messageInterface := reflect.New(definition).Interface()
+	err := json.Unmarshal([]byte(jsonData), &messageInterface)
 	if err != nil {
 		log.Print("Error unmarshalling the message", err)
 		return nil
 	}
-	__message := reflect.ValueOf(_message).Elem().Elem()
-	if message, ok := __message.Addr().Interface().(interfaces.IMessage); ok {
+	if message, ok := reflect.ValueOf(messageInterface).Elem().Interface().(interfaces.IMessage); ok {
 		return message
 	}
 

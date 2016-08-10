@@ -10,10 +10,10 @@ type messageError struct {
 }
 
 func init() {
-	SetMessageDefinition(NewMessageError(nil))
+	SetMessageDefinition(newMessageError(nil))
 }
 
-func NewMessageError(reason error) *messageError {
+func newMessageError(reason error) *messageError {
 	message := &messageError{
 		Message: NewMessage(MessageTypeError),
 	}

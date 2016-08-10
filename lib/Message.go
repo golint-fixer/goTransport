@@ -15,7 +15,7 @@ const headerDelimiter = "\f"
 type Message struct {
 	Id      uint64                 `json:"id"`
 	Type    interfaces.MessageType `json:"type"`
-	session interfaces.Session     `json:"-"`
+	session interfaces.ISession    `json:"-"`
 }
 
 //Constructor
@@ -28,7 +28,7 @@ func NewMessage(message_type interfaces.MessageType) Message {
 
 //func validate() interfaces.IMessage {return &Message{}}
 
-func (message *Message) Initialize(session interfaces.Session) {
+func (message *Message) Initialize(session interfaces.ISession) {
 	message.session = session
 
 	if message.GetId() > session.GetCurrentId() {
@@ -37,7 +37,7 @@ func (message *Message) Initialize(session interfaces.Session) {
 }
 
 //getters and setters
-func (message *Message) GetSession() interfaces.Session {
+func (message *Message) GetSession() interfaces.ISession {
 	return message.session
 }
 
@@ -94,7 +94,7 @@ func UnSerialize(data string) interfaces.IMessage {
 		return nil
 	}
 
-	return Build(definition, parts[1])
+	return build(definition, parts[1])
 }
 
 //Reply to this message.

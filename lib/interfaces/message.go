@@ -5,8 +5,8 @@ type CallableMethod interface{}
 type MessageType int
 
 type IMessage interface {
-	Initialize(manager Session)
-	GetSession() Session
+	Initialize(manager ISession)
+	GetSession() ISession
 
 	SetId(id uint64)
 	GetId() uint64

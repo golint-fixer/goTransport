@@ -12,10 +12,10 @@ type messageMethod struct {
 }
 
 func init() {
-	SetMessageDefinition(NewMessageMethod("", nil))
+	SetMessageDefinition(newMessageMethod("", nil))
 }
 
-func NewMessageMethod(name string, parameters []interface{}) *messageMethod {
+func newMessageMethod(name string, parameters []interface{}) *messageMethod {
 	return &messageMethod{
 		Message:    NewMessage(MessageTypeMethod),
 		Name:       name,
@@ -33,7 +33,7 @@ func (message *messageMethod) Received() error {
 	defer func() {
 		// recover from panic if one occurred. Set err to nil otherwise.
 		if recover() != nil {
-			message.Reply(NewMessageError(errors.New("Panic whilst running method")))
+			message.Reply(newMessageError(errors.New("Panic whilst running method")))
 		}
 	}()
 
@@ -65,6 +65,6 @@ func (message *messageMethod) Received() error {
 	}
 
 	//Reply with the returned result by the called method
-	message.Reply(NewMessageMethodResult(true, result))
+	message.Reply(newMessageMethodResult(true, result))
 	return nil
 }

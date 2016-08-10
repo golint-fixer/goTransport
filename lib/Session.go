@@ -9,23 +9,24 @@ import (
 )
 
 type session struct {
-	socket          sockjs.Session
-	client          interfaces.Client
-	currentId       uint64
-	currentId_mutex *sync.Mutex
+	socket         sockjs.Session
+	client         interfaces.IClient
+	currentId      uint64
+	currentIDMutex *sync.Mutex
 }
 
-func NewSession(socket sockjs.Session, client interfaces.Client) interfaces.Session {
+//Creates a new session.
+func NewSession(socket sockjs.Session, client interfaces.IClient) interfaces.ISession {
 	return &session{
-		socket:          socket,
-		client:          client,
-		currentId:       0,
-		currentId_mutex: new(sync.Mutex),
+		socket:         socket,
+		client:         client,
+		currentId:      0,
+		currentIDMutex: new(sync.Mutex),
 	}
 
 }
 
-func (session *session) GetClient() interfaces.Client {
+func (session *session) GetClient() interfaces.IClient {
 	return session.client
 }
 
@@ -34,15 +35,15 @@ func (session *session) GetCurrentId() uint64 {
 }
 
 func (session *session) SetCurrentId(id uint64) {
-	session.currentId_mutex.Lock()
+	session.currentIDMutex.Lock()
 	session.currentId = id
-	session.currentId_mutex.Unlock()
+	session.currentIDMutex.Unlock()
 }
 
 func (session *session) IncrementCurrentId() {
-	session.currentId_mutex.Lock()
+	session.currentIDMutex.Lock()
 	session.currentId++
-	session.currentId_mutex.Unlock()
+	session.currentIDMutex.Unlock()
 }
 
 func (session *session) Messaged(data string) error {
@@ -56,7 +57,7 @@ func (session *session) Messaged(data string) error {
 
 	err := message.Received()
 	if err != nil {
-		message.Reply(NewMessageError(err))
+		message.Reply(newMessageError(err))
 		return err
 	}
 	return nil
@@ -68,7 +69,7 @@ func (session *session) Send(message string) {
 }
 
 func (session *session) Call(name string, parameters []interface{}) {
-	message := NewMessageMethod(name, parameters)
+	message := newMessageMethod(name, parameters)
 	message.Initialize(session)
 	Send(message)
 }
