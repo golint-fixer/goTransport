@@ -2,7 +2,7 @@ package lib
 
 import (
 	"testing"
-	"github.com/iain17/goTransport/transport/lib/interfaces"
+	"github.com/iain17/goTransport/lib/interfaces"
 )
 
 type messageTest struct {

@@ -3,14 +3,14 @@ package main
 import (
 	"net/http"
 	"log"
-	"github.com/iain17/goTransport/transport"
 	"errors"
-	"github.com/iain17/goTransport/transport/lib/interfaces"
+	"github.com/iain17/goTransport/lib/interfaces"
+	"github.com/iain17/goTransport"
 )
 
 func main() {
-	http.Handle("/", http.FileServer(http.Dir("../../")))
-	transporter := transport.New("/ws")
+	http.Handle("/", http.FileServer(http.Dir("../client/")))
+	transporter := goTransport.New("/ws")
 	transporter.Method("ping", ping)
 
 	log.Print("goTransport server spawning at port: 8081")

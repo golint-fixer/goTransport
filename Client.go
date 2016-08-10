@@ -1,11 +1,11 @@
-package transport
+package goTransport
 
 import (
 	"gopkg.in/igm/sockjs-go.v2/sockjs"
 	"net/http"
-	"github.com/iain17/goTransport/transport/lib/interfaces"
 	"sync"
-	"github.com/iain17/goTransport/transport/lib"
+	"github.com/iain17/goTransport/lib/interfaces"
+	"github.com/iain17/goTransport/lib"
 )
 
 type client struct {

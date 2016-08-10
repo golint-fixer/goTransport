@@ -4,7 +4,7 @@ import (
 	"log"
 	"reflect"
 	"encoding/json"
-	"github.com/iain17/goTransport/transport/lib/interfaces"
+	"github.com/iain17/goTransport/lib/interfaces"
 )
 
 func Build(definition reflect.Type, data string) interfaces.IMessage {

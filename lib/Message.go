@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"errors"
 	"fmt"
-	"github.com/iain17/goTransport/transport/lib/interfaces"
 	"encoding/json"
+	"github.com/iain17/goTransport/lib/interfaces"
 )
 
 const headerDelimiter = "\f"

@@ -3,7 +3,7 @@ package lib
 import (
 	"testing"
 	"reflect"
-	"github.com/iain17/goTransport/transport/lib/interfaces"
+	"github.com/iain17/goTransport/lib/interfaces"
 	"log"
 )
 
