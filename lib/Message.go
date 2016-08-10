@@ -55,12 +55,12 @@ func (message *Message) SetId(id uint64) {
 
 //Sending the message.
 func (message *Message) Sending() error {
-	return errors.New(fmt.Sprint("MessageType %d has not implemented Sending()", message.Type))
+	return errors.New(fmt.Sprintf("MessageType %d has not implemented Sending()", message.Type))
 }
 
 //Received the message.
 func (message *Message) Received() error {
-	return errors.New(fmt.Sprint("MessageType %d has not implemented Received()", message.Type))
+	return errors.New(fmt.Sprintf("MessageType %d has not implemented Received()", message.Type))
 }
 
 //This function converts a message object to the respectable message structure. header and json.
@@ -90,7 +90,7 @@ func UnSerialize(data string) interfaces.IMessage {
 
 	definition := GetMessageDefinition(interfaces.MessageType(message_type))
 	if definition == nil {
-		log.Print("No definition for type: %d", interfaces.MessageType(message_type))
+		log.Printf("No definition for type: %d", interfaces.MessageType(message_type))
 		return nil
 	}
 
@@ -100,7 +100,7 @@ func UnSerialize(data string) interfaces.IMessage {
 //Reply to this message.
 func (message *Message) Reply(replyMessage interfaces.IMessage) {
 	if message.GetSession() == nil {
-		log.Print("MessageType %d has not been initialized.", message.GetType())
+		log.Printf("MessageType %d has not been initialized.", message.GetType())
 		return
 	}
 
@@ -111,7 +111,7 @@ func (message *Message) Reply(replyMessage interfaces.IMessage) {
 //Sends the message to the client.
 func Send(message interfaces.IMessage) {
 	if message.GetSession() == nil {
-		log.Print("MessageType %d has not been initialized.", message.GetType())
+		log.Printf("MessageType %d has not been initialized.", message.GetType())
 		return
 	}
 
