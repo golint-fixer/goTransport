@@ -27,6 +27,6 @@ type ISession interface {
 
 type ICallableSession interface {
 	Call(name string, parameters []interface{}, timeout uint) *promise.Promise
-	Close(status uint32, reason string)
+	Close(reason string)
 	GetId() string
 }
