@@ -4,14 +4,16 @@
 [![Coverage Status](https://codecov.io/gh/iain17/goTransport/branch/master/graph/badge.svg)](https://codecov.io/gh/iain17/goTransport)
 [![Go Report Card](https://goreportcard.com/badge/github.com/iain17/goTransport?v=1)](https://goreportcard.com/report/github.com/iain17/goTransport)
 [![Gitter](https://badges.gitter.im/join_chat.svg)](https://gitter.im/iain17/goTransport)
-After years of working with MeteorJS in combination with Angular, I wanted to recreate and improve to some extent some of that magic but using Go as a backend.
 
+After years of working with MeteorJS in combination with Angular. I wanted to recreate and improve to some extent, some of that magic but using Go as a backend.
+Building on top off Sockj
 This project is designed to do the following:
 - Easy Remote Procedure Calls (RPC) on both server (GoLang) and client (Angular)
 - Sync collections of data.
 
 This repository is a work in progress. Anything is Master is considered Stable. Its not recommended to use this yet in release.
 
+Client repo can be found here: [goTransport-client](https://github.com/iain17/goTransport-client).
 Building on top off the work of: [Igor Mihalik's sockjs-go](https://github.com/igm/sockjs-go).
 
 ## Omissions
